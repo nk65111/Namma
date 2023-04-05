@@ -7,14 +7,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.namma.api.dto.DriverKyc;
+import com.namma.api.dto.DriverKycDto;
 
 @RestController
 @RequestMapping("/api/v1/driver")
 public class Driver {
 
     @PostMapping("/auth/kyc")
-    public ResponseEntity<String> registerDriver(@RequestBody DriverKyc driverKyc) {
+    public ResponseEntity<String> registerDriver(@RequestBody DriverKycDto driverKyc) {
         return ResponseEntity.ok("Driver registered successfully!");
     }
 

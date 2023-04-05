@@ -1,5 +1,5 @@
 package com.namma.api.dto;
 
-public class DriverKyc {
+public class DriverDto {
 
 }
