@@ -1,6 +1,7 @@
 package com.namma.api.services;
 
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,9 +19,11 @@ public class OtpServiceImpl implements OtpService{
 	@Override
     public String generateOtp() {
         // Generate OTP 
+		 Random random = new Random();
+	     int otp = 100000 + random.nextInt(900000);
 		// useing twillio for send notification
-        String otp = "";
-        return otp;
+        
+	     return String.valueOf(otp);
     }
 
 	@Override

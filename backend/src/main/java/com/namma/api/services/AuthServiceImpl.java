@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.transaction.Transactional;
 
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,11 +60,47 @@ public class AuthServiceImpl implements AuthService{
         authRepository.save(auth);
 	}
 	
-	public AuthDto getProfile() throws PhoneNumberNotFoundException {
+	public AuthDto getProfile(String phoneNumber) throws PhoneNumberNotFoundException {
 		
-		Optional<Auth> authOptional = authRepository.findByPhoneNumber("");
-		Auth auth = authOptional.orElseThrow(() -> new PhoneNumberNotFoundException("Auth not found with phone number: " + ""));
+		Optional<Auth> authOptional = authRepository.findByPhoneNumber(phoneNumber);
+		Auth auth = authOptional.orElseThrow(() -> new PhoneNumberNotFoundException("Auth not found with phone number: "+phoneNumber + ""));
 		
+		AuthDto authDto=authtoAuthDto(auth);
+		return authDto;
+	}
+	
+	public AuthDto updateProfile(AuthDto authDto) throws PhoneNumberNotFoundException {
+	    Optional<Auth> authOptional=authRepository.findByPhoneNumber(authDto.getPhoneNumber());
+	    Auth auth =authOptional.orElseThrow(()->new PhoneNumberNotFoundException("Auth not found with phone number: "+authDto.getPhoneNumber()+""));
+	    
+	    auth.setAuthType(authDto.getAuthType());
+	    auth.setGender(authDto.getGender());
+	    auth.setId(authDto.getId());
+	    auth.setKycStatus(authDto.getKycStatus());
+	    auth.setOnboardingStep(authDto.getOnboardingStep());
+	    auth.setUsername(authDto.getUsername());
+	    
+	    Auth updatedAuth=  this.authRepository.save(auth);
+	    AuthDto updatedAuthDto=authtoAuthDto(updatedAuth);
+	    return updatedAuthDto;
+	    
+	    
+	}
+	
+	public Auth authDtoToAuth(AuthDto authDto) {
+		Auth auth =new Auth();
+		auth.setAuthType(authDto.getAuthType());
+	    auth.setGender(authDto.getGender());
+	    auth.setId(authDto.getId());
+	    auth.setKycStatus(authDto.getKycStatus());
+	    auth.setOnboardingStep(authDto.getOnboardingStep());
+	    auth.setUsername(authDto.getUsername());
+	    auth.setPhoneNumber(authDto.getPhoneNumber());
+	    return auth;
+	}
+	
+	
+	public AuthDto authtoAuthDto(Auth auth) {
 		AuthDto authDto = new AuthDto();
 		authDto.setAuthType(auth.getAuthType());
 		authDto.setGender(auth.getGender());
@@ -73,9 +110,5 @@ public class AuthServiceImpl implements AuthService{
 		authDto.setPhoneNumber(auth.getPhoneNumber());
 		authDto.setUsername(auth.getUsername());
 		return authDto;
-	}
-	
-	public void updateProfile(AuthDto authDto) {
-		
 	}
 }

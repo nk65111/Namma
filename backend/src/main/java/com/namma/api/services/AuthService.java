@@ -7,7 +7,7 @@ import com.namma.api.exception.PhoneNumberNotFoundException;
 public interface AuthService {
 	public void generateOtp(String phoneNumber);
 	public void verifyOtp(String phoneNumber, String otp) throws OtpNotValidException, PhoneNumberNotFoundException;
-	public AuthDto getProfile() throws PhoneNumberNotFoundException;
-	public void updateProfile(AuthDto authDto);
+	public AuthDto getProfile(String phoneNumber) throws PhoneNumberNotFoundException;
+	public AuthDto updateProfile(AuthDto authDto) throws PhoneNumberNotFoundException;
 }
  
