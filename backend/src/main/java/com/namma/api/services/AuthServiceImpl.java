@@ -6,6 +6,7 @@ import javax.transaction.Transactional;
 
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.namma.api.dto.AuthDto;
@@ -24,18 +25,22 @@ public class AuthServiceImpl implements AuthService{
 	@Autowired
 	private OtpService otpService;
 	
+	@Autowired
+	private BCryptPasswordEncoder  bCryptPasswordEncoder;
+	
+	
 	public void generateOtp(String phoneNumber) {
 		Optional<Auth> existingAuth = authRepository.findByPhoneNumber(phoneNumber);
 		String token = otpService.generateOtp();
-		
+		System.out.println("OTP"+token);
 		if(!existingAuth.isPresent()) {
 			Auth auth = new Auth();
 	    	auth.setPhoneNumber(phoneNumber);
-	    	auth.setOtp(token);
+	    	auth.setOtp(bCryptPasswordEncoder.encode(token));
 	    	authRepository.save(auth);
 		}else {
 			Auth auth = existingAuth.get();
-			auth.setOtp(token);
+			auth.setOtp(bCryptPasswordEncoder.encode(token));
 			authRepository.save(auth);
 		}
 	}
@@ -78,7 +83,7 @@ public class AuthServiceImpl implements AuthService{
 	    auth.setId(authDto.getId());
 	    auth.setKycStatus(authDto.getKycStatus());
 	    auth.setOnboardingStep(authDto.getOnboardingStep());
-	    auth.setUsername(authDto.getUsername());
+	    auth.setName(authDto.getName());
 	    
 	    Auth updatedAuth=  this.authRepository.save(auth);
 	    AuthDto updatedAuthDto=authtoAuthDto(updatedAuth);
@@ -94,7 +99,7 @@ public class AuthServiceImpl implements AuthService{
 	    auth.setId(authDto.getId());
 	    auth.setKycStatus(authDto.getKycStatus());
 	    auth.setOnboardingStep(authDto.getOnboardingStep());
-	    auth.setUsername(authDto.getUsername());
+	    auth.setName(authDto.getName());
 	    auth.setPhoneNumber(authDto.getPhoneNumber());
 	    return auth;
 	}
@@ -108,7 +113,7 @@ public class AuthServiceImpl implements AuthService{
 		authDto.setKycStatus(auth.getKycStatus());
 		authDto.setOnboardingStep(auth.getOnboardingStep());
 		authDto.setPhoneNumber(auth.getPhoneNumber());
-		authDto.setUsername(auth.getUsername());
+		authDto.setName(auth.getName());
 		return authDto;
 	}
 }

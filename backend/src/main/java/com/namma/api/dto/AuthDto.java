@@ -16,7 +16,7 @@ public class AuthDto {
 	@NotNull(message = "Phone number is required")
 	private String phoneNumber;
 	
-	private String username;
+	private String name;
 	
 	private Gender gender;
 	
