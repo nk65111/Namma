@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import lombok.Data;
 
 @Data
@@ -44,6 +46,12 @@ public class DriverKycDto {
     private LocalDateTime kycSubmittedAt;
 
     private LocalDateTime kycApprovedAt;
+    
+    private MultipartFile selfieImage;
+    
+    private MultipartFile drivingLicenceImage;
+    
+    
 
     // getters and setters
 }

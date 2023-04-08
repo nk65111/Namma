@@ -9,12 +9,16 @@ import com.namma.api.dto.DriverKycDto;
 import com.namma.api.entity.DriverKyc;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.repository.DriverKycRepository;
+import com.namma.api.utility.UploadFileUtility;
 
 @Service
 public class DriverKycServiceImpl implements DriverKycService {
 
     @Autowired
     private DriverKycRepository driverKycRepository;
+    
+    @Autowired
+    private UploadFileUtility uploadFileUtility;
 
     @Override
     public void registerDriverKyc(DriverKycDto driverKycDto) {
@@ -27,7 +31,10 @@ public class DriverKycServiceImpl implements DriverKycService {
         driverKyc.setAccountHolderName(driverKycDto.getAccountHolderName());
         driverKyc.setVehicleRegistrationNumber(driverKycDto.getVehicleRegistrationNumber());
         driverKyc.setVehicleModel(driverKycDto.getVehicleModel());
-        driverKyc.setSelfie(driverKycDto.getSelfie());
+        
+        //convert selfie image to url using cloudnary
+        String selfieUrl = uploadFileUtility.uploadFile(driverKycDto.getSelfieImage());
+        driverKyc.setSelfie(selfieUrl);
 
         // Save DriverKyc entity to database
         driverKycRepository.save(driverKyc);
