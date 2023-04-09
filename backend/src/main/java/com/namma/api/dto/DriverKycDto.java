@@ -7,9 +7,18 @@ import javax.validation.constraints.Size;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class DriverKycDto {
 	private Long Id;
 
@@ -40,8 +49,8 @@ public class DriverKycDto {
     @NotBlank(message = "Vehicle model is required")
     @Size(max = 50, message = "Vehicle model must be less than 50 characters")
     private String vehicleModel;
-
-    private String selfie;
+    
+    private Long authId;
 
     private LocalDateTime kycSubmittedAt;
 

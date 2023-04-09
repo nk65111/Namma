@@ -6,6 +6,6 @@ import com.namma.api.exception.DriverNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 
 public interface DriverKycService {
-	public void registerDriverKyc(DriverKycDto driverKycDto);
+	public void registerDriverKyc(DriverKycDto driverKycDto) throws ResourceNotFoundException;
 	public DriverKycDto getDriverKycDetails(long driverId) throws ResourceNotFoundException;
 }

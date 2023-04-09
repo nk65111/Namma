@@ -3,6 +3,7 @@ package com.namma.api.config;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -10,9 +11,15 @@ import com.cloudinary.Cloudinary;
 
 @Configuration
 public class CloudnaryConfig {
-	private final String CLOUD_NAME = "YOUR_CLOUD_NAME";
-    private final String API_KEY = "YOUR_API_KEY";
-    private final String API_SECRET = "YOUR_API_SECRET";
+	
+	@Value("${cloudnary.name}")
+	private String CLOUD_NAME;
+	
+	@Value("${cloudnary.api.key}")
+    private String API_KEY;
+	
+	@Value("${cloudnary.api.secret}")
+    private String API_SECRET;
     
     @Bean
     public Cloudinary cloudinary(){

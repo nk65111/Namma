@@ -9,6 +9,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -55,6 +56,9 @@ public class Auth implements UserDetails{
 	private KycStep onboardingStep;
 	
 	private String otp;
+	
+	@OneToOne(mappedBy = "auth")
+	private DriverKyc driverKyc;
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
