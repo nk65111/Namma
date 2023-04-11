@@ -1,6 +1,7 @@
 package com.namma.api.dto;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -9,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -60,7 +60,9 @@ public class DriverKycDto {
     
     private MultipartFile drivingLicenceImage;
     
+    private Date createdAt;
     
+    private LocalDateTime updatedAt;
 
     // getters and setters
 }

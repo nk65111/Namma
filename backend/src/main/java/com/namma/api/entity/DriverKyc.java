@@ -1,11 +1,18 @@
 package com.namma.api.entity;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +43,15 @@ public class DriverKyc {
     private String kycApprovedAt;
     
     @OneToOne
-    @JoinColumn(name = "auth_id")
-    private Auth auth;
+    @JoinColumn(name = "id")
+    private Driver driver;
+    
+    @CreatedDate
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Date createdAt;
+
+    @LastModifiedDate
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
     
 }

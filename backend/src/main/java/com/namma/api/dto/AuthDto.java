@@ -11,20 +11,9 @@ import lombok.Data;
 
 @Data
 public class AuthDto {
-	private Long Id;
-	
 	@NotNull(message = "Phone number is required")
 	private String phoneNumber;
 	
 	private String name;
-	
-	private Gender gender;
-	
-	private AuthType authType;
-	
-	private KycStatus kycStatus;
-	
-	private KycStep onboardingStep;
-	
 	private String otp;
 }
