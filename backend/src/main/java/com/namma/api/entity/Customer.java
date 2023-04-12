@@ -21,7 +21,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@PrimaryKeyJoinColumn(name="customerId")
+//@PrimaryKeyJoinColumn(name="customerId")
 public class Customer extends Auth {
 	
 	@Enumerated(EnumType.STRING) 

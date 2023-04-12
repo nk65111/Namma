@@ -43,9 +43,9 @@ public class DriverKyc {
     private String kycApprovedAt;
     
     @OneToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "driver_id")
     private Driver driver;
-    
+     
     @CreatedDate
     @Column(name = "created_at", nullable = false, updatable = false)
     private Date createdAt;

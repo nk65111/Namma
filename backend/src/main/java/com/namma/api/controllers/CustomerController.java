@@ -22,15 +22,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.namma.api.config.JwtUtil;
-import com.namma.api.dto.AuthDto;
 import com.namma.api.dto.CustomerDto;
-import com.namma.api.entity.Auth;
-import com.namma.api.entity.JwtRequest;
-import com.namma.api.entity.JwtResponse;
-import com.namma.api.exception.PhoneNumberNotFoundException;
+import com.namma.api.dto.JwtRequest;
+import com.namma.api.dto.JwtResponse;
 import com.namma.api.exception.ResourceNotFoundException;
+import com.namma.api.services.AbstractUserDetailsService;
 import com.namma.api.services.CustomerService;
-import com.namma.api.services.UserDetailsServiceImpl;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -43,7 +40,7 @@ public class CustomerController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private AbstractUserDetailsService abstractUserDetailsService ;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -63,7 +60,7 @@ public class CustomerController {
             throw new Exception(e.getMessage());
         }
 
-        UserDetails userDetails= this.userDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
+        UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
         return  ResponseEntity.ok(new JwtResponse(token));
     }
@@ -91,12 +88,6 @@ public class CustomerController {
     	customerService.deleteProfile(customerId);
     	return new ResponseEntity<String>("Profile updated successfully", HttpStatus.OK);
     }
-
-
-//    @GetMapping("/current-user")
-//    public Auth getCurrentUser(Principal principal){
-//        return  (Auth)this.userDetailsService.loadUserByUsername(principal.getName());
-//    }
 	
     public void authentication(String username,String password) throws Exception {
         try {

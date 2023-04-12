@@ -11,20 +11,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.namma.api.dto.CustomerDto;
-import com.namma.api.entity.Auth;
 import com.namma.api.entity.Customer;
 import com.namma.api.exception.OtpNotValidException;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
-import com.namma.api.repository.AuthRepository;
 import com.namma.api.repository.CustomerRepository;
 
 @Service
 @Transactional
 public class CustomerServiceImpl implements CustomerService{
-	
-	@Autowired
-	private AuthRepository authRepository;
 	
 	@Autowired
 	private CustomerRepository customerRepository;
@@ -38,31 +33,31 @@ public class CustomerServiceImpl implements CustomerService{
 	 
 	@Override
 	public void generateOtp(String phoneNumber) {
-		Optional<Auth> existingAuth = authRepository.findByPhoneNumber(phoneNumber);
+		Optional<Customer> existingAuth = customerRepository.findByPhoneNumber(phoneNumber);
 		String token = otpService.generateOtp();
 		System.out.println("OTP"+token);
 		if(!existingAuth.isPresent()) {
-			Auth auth = new Auth();
-	    	auth.setPhoneNumber(phoneNumber);
-	    	auth.setOtp(bCryptPasswordEncoder.encode(token));
-	    	authRepository.save(auth);
+			Customer customer = new Customer();
+			customer.setPhoneNumber(phoneNumber);
+			customer.setOtp(bCryptPasswordEncoder.encode(token));
+	    	customerRepository.save(customer);
 		}else {
-			Auth auth = existingAuth.get();
-			auth.setOtp(bCryptPasswordEncoder.encode(token));
-			authRepository.save(auth);
+			Customer customer = existingAuth.get();
+			customer.setOtp(bCryptPasswordEncoder.encode(token));
+			customerRepository.save(customer);
 		}
 	}
 	
 	@Override
 	public void verifyOtp(String phoneNumber, String otp) throws OtpNotValidException, PhoneNumberNotFoundException {
 		// Find auth by phone number
-        Optional<Auth> authOptional = authRepository.findByPhoneNumber(phoneNumber);
+        Optional<Customer> authOptional = customerRepository.findByPhoneNumber(phoneNumber);
         
         if (!authOptional.isPresent()) {
             throw new PhoneNumberNotFoundException("Auth not found with phone number: " + phoneNumber);
         }
 
-        Auth auth = authOptional.get();
+        Customer auth = authOptional.get();
 
         // Check if OTP is valid
         if (!otpService.isOtpValid(phoneNumber, otp)) {
@@ -71,7 +66,7 @@ public class CustomerServiceImpl implements CustomerService{
 
         // Clear OTP and update driver record
         auth.setOtp(null);
-        authRepository.save(auth);
+        customerRepository.save(auth);
 	}
 
 	@Override

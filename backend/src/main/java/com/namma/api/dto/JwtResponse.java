@@ -1,4 +1,4 @@
-package com.namma.api.entity;
+package com.namma.api.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

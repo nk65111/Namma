@@ -14,7 +14,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.namma.api.services.UserDetailsServiceImpl;
+import com.namma.api.services.AbstractUserDetailsService;
 
 
 
@@ -25,7 +25,7 @@ import com.namma.api.services.UserDetailsServiceImpl;
 public class UserSecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsServiceImpl;
+    private AbstractUserDetailsService abstractUserDetailsService;
 
     @Autowired
     private  JwtAuthenticationEntryPoint unAuthorizedHandler;
@@ -46,7 +46,7 @@ public class UserSecurityConfig extends WebSecurityConfigurerAdapter{
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(this.userDetailsServiceImpl).passwordEncoder(passwordEncoder());
+        auth.userDetailsService(abstractUserDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override

@@ -27,17 +27,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.namma.api.config.JwtUtil;
-import com.namma.api.dto.AuthDto;
-import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.DriverDto;
 import com.namma.api.dto.DriverKycDto;
+import com.namma.api.dto.JwtRequest;
+import com.namma.api.dto.JwtResponse;
 import com.namma.api.entity.Auth;
-import com.namma.api.entity.JwtRequest;
-import com.namma.api.entity.JwtResponse;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
+import com.namma.api.services.AbstractUserDetailsService;
 import com.namma.api.services.DriverService;
-import com.namma.api.services.UserDetailsServiceImpl;
 
 @RestController
 @RequestMapping("/api/v1/driver")
@@ -53,7 +51,7 @@ public class DriverController {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private AbstractUserDetailsService abstractUserDetailsService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -73,7 +71,7 @@ public class DriverController {
             throw new Exception(e.getMessage());
         }
 
-        UserDetails userDetails= this.userDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
+        UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
         return  ResponseEntity.ok(new JwtResponse(token));
     }
@@ -82,7 +80,7 @@ public class DriverController {
 
     @GetMapping("/current-user")
     public Auth getCurrentUser(Principal principal){
-        return  (Auth)this.userDetailsService.loadUserByUsername(principal.getName());
+        return  (Auth)abstractUserDetailsService.loadUserByUsername(principal.getName());
     }
 	
     public void authentication(String username,String password) throws Exception {

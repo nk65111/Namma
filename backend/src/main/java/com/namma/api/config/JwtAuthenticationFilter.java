@@ -15,7 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.namma.api.services.UserDetailsServiceImpl;
+import com.namma.api.services.AbstractUserDetailsService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
@@ -23,8 +23,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
-
+    private AbstractUserDetailsService abstractUserDetailsService;
+ 
     @Autowired
     private  JwtUtil jwtUtil;
 
@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         if(username!=null&& SecurityContextHolder.getContext().getAuthentication()==null){
-          final UserDetails userDetails= this.userDetailsService.loadUserByUsername(username);
+          final UserDetails userDetails = abstractUserDetailsService.loadUserByUsername(username);
           if(jwtUtil.validateToken(jwtToken,userDetails)){
               UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken=new UsernamePasswordAuthenticationToken(userDetails,null,userDetails.getAuthorities());
               usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
