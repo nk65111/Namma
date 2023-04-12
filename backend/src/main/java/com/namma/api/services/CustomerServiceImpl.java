@@ -1,6 +1,8 @@
 package com.namma.api.services;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +42,7 @@ public class CustomerServiceImpl implements CustomerService{
 			Customer customer = new Customer();
 			customer.setPhoneNumber(phoneNumber);
 			customer.setOtp(bCryptPasswordEncoder.encode(token));
+			customer.setCreatedAt(LocalDateTime.now());
 	    	customerRepository.save(customer);
 		}else {
 			Customer customer = existingAuth.get();
@@ -86,12 +89,13 @@ public class CustomerServiceImpl implements CustomerService{
 	@Override
 	public void updateProfile(CustomerDto customerDto) throws ResourceNotFoundException {
 		// TODO Auto-generated method stub
+		
 		Optional<Customer> customerOptional = customerRepository.findById(customerDto.getId());
 		Customer customer = customerOptional.orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: "+customerDto.getId()));
 		
         customer.setName(customerDto.getName());
         customer.setGender(customerDto.getGender());
-        customer.setPhoneNumber(customerDto.getPhoneNumber());
+        customer.setUpdatedAt(LocalDateTime.now());
         
         customerRepository.save(customer);
 	}

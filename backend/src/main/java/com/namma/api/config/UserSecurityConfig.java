@@ -57,7 +57,7 @@ public class UserSecurityConfig extends WebSecurityConfigurerAdapter{
                 .cors()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/v1/auth/generateOtp","/api/v1/auth/verifyOtp","/swagger-ui**", "/swagger-resources/**", "/v2/api-docs", "/webjars/**").permitAll()
+                .antMatchers("/api/v1/customer/generateOtp","/api/v1/customer/verifyOtp","/api/v1/driver/generateOtp","/api/v1/driver/verifyOtp","/swagger-ui**", "/swagger-resources/**", "/v2/api-docs", "/webjars/**").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated()
                 .and()
