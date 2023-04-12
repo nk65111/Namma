@@ -8,6 +8,8 @@ import javax.validation.constraints.Size;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -51,17 +53,27 @@ public class DriverKycDto {
     private String vehicleModel;
     
     private Long authId;
-
+    
+    @JsonIgnore
     private LocalDateTime kycSubmittedAt;
 
+    @JsonIgnore
     private LocalDateTime kycApprovedAt;
     
+    @JsonIgnore
     private MultipartFile selfieImage;
     
+    private String selfieImageLink;
+    
+    @JsonIgnore
     private MultipartFile drivingLicenceImage;
     
-    private Date createdAt;
+    private String driverLicenceImageLink;
     
+    @JsonIgnore
+    private LocalDateTime createdAt;
+    
+    @JsonIgnore
     private LocalDateTime updatedAt;
 
     // getters and setters

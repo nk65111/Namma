@@ -49,6 +49,7 @@ public class CustomerServiceImpl implements CustomerService{
 			customer.setOtp(bCryptPasswordEncoder.encode(token));
 			customerRepository.save(customer);
 		}
+		
 	}
 	
 	@Override

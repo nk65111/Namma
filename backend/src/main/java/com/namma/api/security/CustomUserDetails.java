@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.namma.api.entity.Auth;
 import com.namma.api.entity.Customer;
 import com.namma.api.entity.Driver;
 
@@ -15,8 +16,7 @@ import lombok.Data;
 public class CustomUserDetails implements UserDetails {
 	private static final long serialVersionUID = 1L;
 	
-	private Customer customer;
-	private Driver driver;
+	Auth auth;
 	 
 	private String username;
     private String password;
@@ -29,11 +29,15 @@ public class CustomUserDetails implements UserDetails {
     }
 
     public CustomUserDetails(Customer customer) {
-		this.customer = customer;
+    	auth=customer;
+		username = customer.getPhoneNumber();
+		password=customer.getOtp();
 	}
 
 	public CustomUserDetails(Driver driver) {
-		this.driver = driver;
+		auth=driver;
+		username = driver.getPhoneNumber();
+		password=driver.getOtp();
 	}
 
 	@Override
@@ -43,12 +47,12 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.customer.getOtp();
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return this.customer.getPhoneNumber();
+        return this.username;
     }
 
     @Override

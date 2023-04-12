@@ -1,6 +1,7 @@
 package com.namma.api.controllers;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -16,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,8 +28,11 @@ import com.namma.api.config.JwtUtil;
 import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.JwtRequest;
 import com.namma.api.dto.JwtResponse;
+import com.namma.api.entity.Auth;
 import com.namma.api.exception.ResourceNotFoundException;
+import com.namma.api.security.CustomUserDetails;
 import com.namma.api.services.AbstractUserDetailsService;
+import com.namma.api.services.AbstractUserDetailsServiceImpl;
 import com.namma.api.services.CustomerService;
 
 @RestController
@@ -44,6 +47,9 @@ public class CustomerController {
 
     @Autowired
     private AbstractUserDetailsService abstractUserDetailsService ;
+    
+    @Autowired
+    private AbstractUserDetailsServiceImpl userDetailsServiceImpl;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -65,6 +71,7 @@ public class CustomerController {
 
         UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
+       
         return  ResponseEntity.ok(new JwtResponse(token));
     }
     
@@ -74,22 +81,25 @@ public class CustomerController {
     	return new ResponseEntity<List<CustomerDto>>(customerDtos, HttpStatus.OK);
     }
     
-    @GetMapping("/profile/{customerId}")
-    public ResponseEntity<CustomerDto> getProfile(@PathVariable("customerId") Long customerId) throws ResourceNotFoundException {
-    	CustomerDto customerDto = customerService.getProfile(customerId);
-    	return new ResponseEntity<CustomerDto>(customerDto, HttpStatus.OK);
+    @GetMapping("/profile")
+    public ResponseEntity<Auth> getProfile(Principal principal) throws ResourceNotFoundException {
+    	Auth auth= getAuthByJwt(principal);
+    	return new ResponseEntity<>(auth, HttpStatus.OK);
     }
     
     @PutMapping("/update-profile")
-    public ResponseEntity<String> updateProfile(@Valid @RequestBody CustomerDto customerDto) throws ResourceNotFoundException{
+    public ResponseEntity<String> updateProfile(@Valid @RequestBody CustomerDto customerDto,Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	customerDto.setId(auth.getId());
     	customerService.updateProfile(customerDto);
     	return new ResponseEntity<String>("Profile updated successfully", HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete-profile/{customerId}")
-    public ResponseEntity<String> deleteProfile(@PathVariable Long customerId) throws ResourceNotFoundException{
-    	customerService.deleteProfile(customerId);
-    	return new ResponseEntity<String>("Profile updated successfully", HttpStatus.OK);
+    @DeleteMapping("/delete-profile")
+    public ResponseEntity<String> deleteProfile(Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	customerService.deleteProfile(auth.getId());
+    	return new ResponseEntity<String>("Profile delete successfully", HttpStatus.OK);
     }
 	
     public void authentication(String username,String password) throws Exception {
@@ -102,6 +112,11 @@ public class CustomerController {
         }catch (Exception e){
             throw  new Exception(e.getMessage());
         }
+    }
+    
+    public Auth getAuthByJwt(Principal principal) {
+    	CustomUserDetails userDetails= (CustomUserDetails)this.userDetailsServiceImpl.loadUserByUsername(principal.getName());
+    	return userDetails.getAuth();
     }
     
 }

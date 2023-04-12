@@ -34,6 +34,7 @@ import com.namma.api.dto.JwtResponse;
 import com.namma.api.entity.Auth;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
+import com.namma.api.security.CustomUserDetails;
 import com.namma.api.services.AbstractUserDetailsService;
 import com.namma.api.services.DriverService;
 
@@ -79,8 +80,9 @@ public class DriverController {
 
 
     @GetMapping("/current-user")
-    public Auth getCurrentUser(Principal principal){
-        return  (Auth)abstractUserDetailsService.loadUserByUsername(principal.getName());
+    public ResponseEntity<Auth> getCurrentUser(Principal principal){
+       Auth auth= getAuthByJwt(principal);
+       return new ResponseEntity<Auth>(auth,HttpStatus.OK);
     }
 	
     public void authentication(String username,String password) throws Exception {
@@ -94,6 +96,12 @@ public class DriverController {
             throw  new Exception(e.getMessage());
         }
     }
+    
+    public Auth getAuthByJwt(Principal principal) {
+    	CustomUserDetails userDetails= (CustomUserDetails)this.abstractUserDetailsService.loadUserByUsername(principal.getName());
+    	return userDetails.getAuth();
+    }
+
     
     
     @PostMapping("/kyc")
@@ -122,21 +130,21 @@ public class DriverController {
     	return new ResponseEntity<List<DriverDto>>(driverDtos, HttpStatus.OK);
     }
     
-    @GetMapping("/profile")
-    public ResponseEntity<DriverDto> getProfile(Long customerId) throws ResourceNotFoundException {
-    	DriverDto driverDto = driverService.getProfile(customerId);
-    	return new ResponseEntity<DriverDto>(driverDto, HttpStatus.OK);
-    }
     
     @PutMapping("/update-profile")
-	public ResponseEntity<String> updateProfile(DriverDto driverDto) throws PhoneNumberNotFoundException, ResourceNotFoundException{
+	public ResponseEntity<String> updateProfile(@RequestBody DriverDto driverDto,Principal principal) throws PhoneNumberNotFoundException, ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	driverDto.setId(auth.getId());
     	driverService.updateProfile(driverDto);
 		return new ResponseEntity<>("Profile updated successfully", HttpStatus.OK); 
 	}
     
     @DeleteMapping("/delete-profile")
-    public ResponseEntity<String> deleteProfile(Long driverId) throws ResourceNotFoundException{
-    	driverService.deleteProfile(driverId);
+    public ResponseEntity<String> deleteProfile(Principal principal) throws ResourceNotFoundException{
+    	
+    	Auth auth=getAuthByJwt(principal);
+    	
+    	driverService.deleteProfile(auth.getId());
     	return new ResponseEntity<String>("Profile updated successfully", HttpStatus.OK);
     }
 }

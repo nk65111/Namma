@@ -1,5 +1,6 @@
 package com.namma.api.services;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,10 +48,12 @@ public class DriverServiceImpl implements DriverService {
 			Driver driver = new Driver();
 			driver.setPhoneNumber(phoneNumber);
 			driver.setOtp(bCryptPasswordEncoder.encode(token));
+			driver.setCreatedAt(LocalDateTime.now());
 	    	driverRepository.save(driver);
 		}else {
 			Driver driver = existingAuth.get();
 			driver.setOtp(bCryptPasswordEncoder.encode(token));
+			driver.setCreatedAt(LocalDateTime.now());
 			driverRepository.save(driver);
 		} 
 	}
@@ -79,6 +82,7 @@ public class DriverServiceImpl implements DriverService {
     @Override
     public void registerDriverKyc(DriverKycDto driverKycDto) throws ResourceNotFoundException {
         // Map DriverKycDto to DriverKyc entity
+    	
         DriverKyc driverKyc = new DriverKyc();
         driverKyc.setDrivingLicenseNumber(driverKycDto.getDrivingLicenseNumber());
         driverKyc.setBankname(driverKycDto.getBankName());
@@ -88,13 +92,14 @@ public class DriverServiceImpl implements DriverService {
         driverKyc.setVehicleRegistrationNumber(driverKycDto.getVehicleRegistrationNumber());
         driverKyc.setVehicleModel(driverKycDto.getVehicleModel());
         driverKyc.setKycSubmittedAt(new Date().toString());
+        driverKyc.setCreatedAt(LocalDateTime.now());
         
         Optional<Driver> driverOptional= driverRepository.findById(driverKycDto.getAuthId());
-//        if(driverOptional.get()==null) {
-//        	throw new ResourceNotFoundException("User is not found ");
-//        }else {
-//        	driverKyc.setAuth(driverOptional.get());
-//        }
+        if(driverOptional.get()==null) {
+        	throw new ResourceNotFoundException("User is not found ");
+        }else {
+        	driverKyc.setDriver(driverOptional.get());
+        }
         
         //convert selfie image to url using cloudnary
         String selfieUrl = uploadFileUtility.uploadFile(driverKycDto.getSelfieImage());
@@ -133,7 +138,9 @@ public class DriverServiceImpl implements DriverService {
             driverKycDto.setAccountHolderName(driverKyc.getAccountHolderName());
             driverKycDto.setVehicleRegistrationNumber(driverKyc.getVehicleRegistrationNumber());
             driverKycDto.setVehicleModel(driverKyc.getVehicleModel());
-//            driverKycDto.setSelfie(driverKyc.getSelfie());
+            driverKycDto.setSelfieImageLink(driverKyc.getSelfie());
+            driverKycDto.setDriverLicenceImageLink(driverKyc.getDrivingLicenceImgae());
+            driverKycDto.setAuthId(driverKyc.getDriver().getId());
             return driverKycDto;
         } else {
             throw new ResourceNotFoundException("Driver KYC details not found for driver");
@@ -187,12 +194,11 @@ public class DriverServiceImpl implements DriverService {
 		Driver driver = customerOptional.orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: "+driverDto.getId()));
 		
 		driver.setName(driverDto.getName());
-		driver.setPhoneNumber(driverDto.getPhoneNumber());
 		driver.setAge(driverDto.getAge());
-		//driver.setDriverKyc(driverDto.getDriverKyc());
         driver.setKycStatus(driverDto.getKycStatus());
         driver.setOnboardingStep(driverDto.getOnboardingStep());
         driver.setId(driverDto.getId());
+        driver.setUpdatedAt(LocalDateTime.now());
         
         driverRepository.save(driver);
 	}
@@ -202,6 +208,8 @@ public class DriverServiceImpl implements DriverService {
 		// TODO Auto-generated method stub
 		Optional<Driver> customerOptional = driverRepository.findById(driverId);
 		Driver driver = customerOptional.orElseThrow(() -> new ResourceNotFoundException("Driver not found with id: "+driverId));
+		DriverKyc driverKyc= this.driverKycRepository.findByDriver(driver).get();
+		this.driverKycRepository.delete(driverKyc);
 		driverRepository.delete(driver);
 
 	}

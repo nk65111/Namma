@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.util.Pair;
 
+import com.namma.api.entity.Customer;
 import com.namma.api.enumeration.BookingStatus;
 
 import lombok.Data;
