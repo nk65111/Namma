@@ -4,7 +4,7 @@ import React from 'react'
 import { Keyboard, Text, TouchableWithoutFeedback } from 'react-native'
 import { } from 'react-native-gesture-handler'
 import LinearGradient from 'react-native-linear-gradient'
-import Animated, { FadeIn } from 'react-native-reanimated'
+import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
 import BackButton from '../../components/BackButton'
 import PrimaryButton from '../../components/PrimaryButton'
@@ -13,7 +13,7 @@ import SecondaryButton from '../../components/SecondaryButton'
 function OTPScreen() {
     const navigation = useNavigation()
     return (
-        <Animated.View entering={FadeIn} style={tw`flex-1 items-center justify-center relative`}>
+        <Animated.View exiting={SlideInLeft} entering={SlideInRight} style={tw`flex-1 items-center justify-center relative`}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
                 <LinearGradient colors={['#007FFF', '#007FFF', '#0CAFFF', '#0CAFFF']} style={tw`flex-1 items-center justify-between h-full w-full relative`}>
                     <View style={tw`w-full`}>

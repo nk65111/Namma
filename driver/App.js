@@ -9,12 +9,11 @@ import VersionCheck from 'react-native-version-check'
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Routes from './src/Routes'
 import Splash from './src/screens/Splash'
-import { NativeBaseProvider, Box, KeyboardAvoidingView } from "native-base";
+import { NativeBaseProvider, KeyboardAvoidingView } from "native-base";
 
 const App = () => {
 
   const queryClient = new QueryClient()
-
   const [loading, setLoading] = useState(true)
 
   const disableBackButton = () => {
@@ -60,6 +59,7 @@ const App = () => {
     // notificationListener();
     // createChannels()
   }, [])
+
 
   if (loading) return <Splash setLoading={setLoading} />
 

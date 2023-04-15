@@ -11,7 +11,7 @@ function BackButton() {
       {
         navigation.canGoBack()
           ?
-          <TouchableOpacity onPress={() => navigation.goBack()} style={tw`w-10 h-10 rounded-full bg-white flex-row items-center justify-center p-1 m-3`}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={tw`w-10 h-10 rounded-full bg-white flex-row items-center justify-center p-1 m-3 ml-5`}>
             <Svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={tw`text-gray-800`}>
               <Path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
             </Svg>

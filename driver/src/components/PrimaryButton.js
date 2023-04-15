@@ -5,7 +5,7 @@ import tw from 'twrnc'
 
 function PrimaryButton({ text, onPress, extra = '', disabled = false }) {
     return (
-        <TouchableOpacity disabled={disabled} onPress={() => onPress ? onPress() : {}} style={tw`${disabled ? 'bg-gray-300' : 'bg-rose-500'} py-3 px-6 min-w-32 rounded-lg my-6 ${extra}`}>
+        <TouchableOpacity disabled={disabled} onPress={() => onPress ? onPress() : {}} style={tw`${disabled ? 'bg-gray-300' : 'bg-rose-600'} py-3 px-6 min-w-32 rounded-lg my-6 ${extra}`}>
             <Text style={tw`text-xl text-center font-medium text-white`}>{text}</Text>
         </TouchableOpacity>
     )
