@@ -1,22 +1,27 @@
 package com.namma.api.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.namma.api.dto.RideDto;
+import com.namma.api.exception.ResourceNotFoundException;
+import com.namma.api.services.RideService;
 
 @RestController
 @RequestMapping("/api/v1/ride")
 public class BookingRide {
 	
-	@PostMapping()
-	public ResponseEntity<String> ride(){
-		return new ResponseEntity<String>("Book ride successfully", HttpStatus.CREATED);
-	}
+	
+	
+	
 	
 	@GetMapping("/all-ride")
 	public ResponseEntity<String> getAllRide(){

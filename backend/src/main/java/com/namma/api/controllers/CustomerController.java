@@ -28,12 +28,14 @@ import com.namma.api.config.JwtUtil;
 import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.JwtRequest;
 import com.namma.api.dto.JwtResponse;
+import com.namma.api.dto.RideDto;
 import com.namma.api.entity.Auth;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.security.CustomUserDetails;
 import com.namma.api.services.AbstractUserDetailsService;
 import com.namma.api.services.AbstractUserDetailsServiceImpl;
 import com.namma.api.services.CustomerService;
+import com.namma.api.services.RideService;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -53,11 +55,20 @@ public class CustomerController {
 
     @Autowired
     private JwtUtil jwtUtil;
+    
+    @Autowired
+	private RideService rideService;
 	
 	@PostMapping("/generateOtp")
 	public ResponseEntity<String> generateOtp(@RequestParam("phoneNumber") String phoneNumber) {
 		customerService.generateOtp(phoneNumber);
 		return new ResponseEntity<String>("OTP generated successfully", HttpStatus.OK);
+	}
+	
+	@PostMapping("/book")
+	public ResponseEntity<String> bookride(@RequestBody RideDto rideDto) throws ResourceNotFoundException{
+		this.rideService.addRide(rideDto);
+		return new ResponseEntity<String>("Ride booked successfully", HttpStatus.CREATED);
 	}
 	
     @PostMapping("/verifyOtp")
