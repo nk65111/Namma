@@ -5,6 +5,7 @@ import java.util.List;
 import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.DriverDto;
 import com.namma.api.dto.DriverKycDto;
+import com.namma.api.dto.DriverLocationDto;
 import com.namma.api.exception.OtpNotValidException;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
@@ -21,6 +22,8 @@ public interface DriverService {
 	public DriverDto getProfile(Long driverId) throws ResourceNotFoundException;
 	public void updateProfile(DriverDto driverDto) throws ResourceNotFoundException;
 	public void deleteProfile(Long driverId) throws ResourceNotFoundException;
+	
+	public void updateDriverLocation(DriverLocationDto driverLocationDto) throws ResourceNotFoundException;
 	
 }
   

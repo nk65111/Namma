@@ -7,9 +7,18 @@ import com.namma.api.enumeration.Gender;
 import com.namma.api.enumeration.KycStatus;
 import com.namma.api.enumeration.KycStep;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class AuthDto {
 	@NotNull(message = "Phone number is required")
 	private String phoneNumber;

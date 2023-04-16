@@ -10,14 +10,17 @@ import org.springframework.stereotype.Service;
 import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.DriverDto;
 import com.namma.api.dto.DriverKycDto;
+import com.namma.api.dto.DriverLocationDto;
 import com.namma.api.entity.Auth;
 import com.namma.api.entity.Customer;
 import com.namma.api.entity.Driver;
 import com.namma.api.entity.DriverKyc;
+import com.namma.api.entity.DriverLocation;
 import com.namma.api.exception.OtpNotValidException;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.repository.DriverKycRepository;
+import com.namma.api.repository.DriverLocationRepository;
 import com.namma.api.repository.DriverRepository;
 import com.namma.api.utility.UploadFileUtility;
 
@@ -38,6 +41,9 @@ public class DriverServiceImpl implements DriverService {
 	
 	@Autowired
 	private BCryptPasswordEncoder  bCryptPasswordEncoder;
+	
+	@Autowired
+	private DriverLocationRepository driverLocationRepository;
     
     
     public void generateOtp(String phoneNumber) {
@@ -108,6 +114,10 @@ public class DriverServiceImpl implements DriverService {
         //convert driving licence to url using cloudinary
         String drivingLicenceUrl=uploadFileUtility.uploadFile(driverKycDto.getDrivingLicenceImage());
         driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
+        
+        
+        //set driver kyc status
+        //todo
 
         // Save DriverKyc entity to database
         driverKycRepository.save(driverKyc);
@@ -212,5 +222,26 @@ public class DriverServiceImpl implements DriverService {
 		this.driverKycRepository.delete(driverKyc);
 		driverRepository.delete(driver);
 
+	}
+
+	@Override
+	public void updateDriverLocation(DriverLocationDto driverLocationDto) throws ResourceNotFoundException {
+		Optional<Driver> driverOptional= this.driverRepository.findById(driverLocationDto.getDrivingId());
+		Driver driver=driverOptional.orElseThrow(()-> new ResourceNotFoundException("Driver is noy found with id:"+driverLocationDto.getDrivingId()));
+		
+		Optional<DriverLocation> driverLocationOptional=this.driverLocationRepository.findByDriver(driver);
+	    if(driverLocationOptional.isPresent()==false) {
+		    DriverLocation driverLocation=new DriverLocation();
+		    driverLocation.setDriver(driver);
+		    driverLocation.setLatitude(driverLocationDto.getLatitude());
+		    driverLocation.setLongitutde(driverLocationDto.getLongitutde());
+		    this.driverLocationRepository.save(driverLocation);
+	    }else {
+		    DriverLocation driverLocation=driverLocationOptional.get();
+		    driverLocation.setLatitude(driverLocationDto.getLatitude());
+		    driverLocation.setLongitutde(driverLocationDto.getLongitutde());
+		    this.driverLocationRepository.save(driverLocation);
+	    }
+	   
 	}
 }

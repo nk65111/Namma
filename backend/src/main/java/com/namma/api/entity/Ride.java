@@ -1,8 +1,9 @@
 package com.namma.api.entity;
 
-import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.LocalTime;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -33,7 +34,18 @@ public class Ride {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 	
-	private LocalDateTime pickUpTime;
+	private String date;
+	
+	@Column(name = "pickup_time_first")
+    @Basic(optional = false)
+    private LocalTime pickupTimeFirst;
+	
+	@Column(name = "pickup_time_second")
+    @Basic(optional = false)
+    private LocalTime pickupTimeSecond;
+	
+	private Boolean isReturn;
+	
 	private Boolean isCompleted;
 	
 	
@@ -47,4 +59,7 @@ public class Ride {
 	@ManyToOne
     @JoinColumn(name = "driver_id")
 	private Driver driver;
+	
+	private Long pricePerKilometer;
+	private Long totalPrice;
 }

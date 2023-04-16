@@ -21,6 +21,11 @@ public class RideDto {
 	private Double pickUpLongitute;
 	private Double dropLatitude;
 	private Double dropLongitute;
-	private String pickUpTime;
+	private String date;
+	private int pickUpFirstHour;
+	private int pickUpFirstMinute;
+	private int pickUpSecondHour;
+	private int pickUpSecondMinute;
+	private Boolean isReturn;
 	private Boolean isCompleted;
 }
