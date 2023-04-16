@@ -7,7 +7,14 @@ RNLocation.configure({
 export const colors = {
     blue: '#0096FF',
     black: '#222',
-    white: '#fff'
+    white: '#fff',
+    light_grey: "#D1D1D1",
+    yellow: "#F0BA2B",
+    red: "#FA5805",
+    gradient_blue: ['#007FFF', '#007FFF', '#0CAFFF', '#0CAFFF'],
+    gradient_red: ['#e53e3e', '#f56565'],
+    gradient_yellow: ['#E9B93B', '#E9A800', '#F1CD6F'],
+
 }
 
 

@@ -7,12 +7,13 @@ import { SvgCssUri } from 'react-native-svg';
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
 import PrimaryButton from '../components/PrimaryButton'
+import { colors } from '../utils/constant'
 
 function IntroScreen() {
   const navigation = useNavigation()
   return (
     <Animated.View exiting={SlideInLeft} entering={FadeIn.duration(600)} style={tw`flex-1 items-center justify-center`}>
-      <LinearGradient colors={['#007FFF', '#007FFF', '#0CAFFF', '#0CAFFF']} style={tw`flex-1 items-center justify-center h-full w-full relative`}>
+      <LinearGradient colors={colors.gradient_blue} style={tw`flex-1 items-center justify-center h-full w-full relative`}>
         <View style={tw`flex-1 w-full px-10 py-20`}>
           <SvgCssUri
             style={tw`mx-auto w-full h-60`}
