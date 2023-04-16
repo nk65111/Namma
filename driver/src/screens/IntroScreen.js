@@ -1,22 +1,23 @@
 import React from 'react'
 import { Text, View } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
-import Animated, { FadeIn } from 'react-native-reanimated'
+import Animated, { FadeIn, SlideInLeft } from 'react-native-reanimated'
 import tw from 'twrnc'
 import { SvgCssUri } from 'react-native-svg';
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { useNavigation } from '@react-navigation/native'
 import PrimaryButton from '../components/PrimaryButton'
+import { colors } from '../utils/constant'
 
 function IntroScreen() {
   const navigation = useNavigation()
   return (
-    <Animated.View entering={FadeIn.duration(600)} style={tw`flex-1 items-center justify-center`}>
-      <LinearGradient colors={['#007FFF', '#007FFF', '#0CAFFF', '#0CAFFF']} style={tw`flex-1 items-center justify-center h-full w-full relative`}>
+    <Animated.View exiting={SlideInLeft} entering={FadeIn.duration(600)} style={tw`flex-1 items-center justify-center`}>
+      <LinearGradient colors={colors.gradient_blue} style={tw`flex-1 items-center justify-center h-full w-full relative`}>
         <View style={tw`flex-1 w-full px-10 py-20`}>
           <SvgCssUri
             style={tw`mx-auto w-full h-60`}
-            uri="https://dev.w3.org/SVG/tools/svgweb/samples/svg-files/ruby.svg"
+            uri="https://www.gstatic.com/meet/user_edu_safety_light_e04a2bbb449524ef7e49ea36d5f25b65.svg"
           />
         </View>
         <View style={tw`w-full p-10 absolute bottom-2 left-0`}>
