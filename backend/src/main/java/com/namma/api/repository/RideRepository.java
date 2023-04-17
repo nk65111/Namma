@@ -1,5 +1,6 @@
 package com.namma.api.repository;
 
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +19,9 @@ public interface RideRepository extends JpaRepository<Ride, Long>{
    
    Optional<Ride> findByCustomerAndDate(Customer customer,String date);
    
-   List<Ride> findByCustomerAndIsCompletedOrderByDateAsc(Customer customer,Boolean isCompleted);
+   
+   
+   List<Ride> findByIsCompletedAndPickupTimeFirstBetween(Boolean isCompleted,LocalTime from,LocalTime to);
+   
 
 }
