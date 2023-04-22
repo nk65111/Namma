@@ -10,13 +10,13 @@ import SecondaryButton from '../../components/SecondaryButton'
 import { PickImage, colors } from '../../utils/constant'
 import Icon from 'react-native-vector-icons/EvilIcons'
 
-function ProfilePic() {
-    const navigation = useNavigation()
+function ProfilePic({ navigation }) {
+    const navigator = useNavigation()
     const [imageUrl, setImageUrl] = useState('');
 
     const handleImageUpload = async (image) => {
         // upload image than move to next screen
-        navigation.navigate('HomeScreen')
+        navigation.push('HomeScreen')
 
     }
 
@@ -30,27 +30,27 @@ function ProfilePic() {
         }
     }
     const handleNext = async () => {
+        handleImageUpload();
+        // if (!imageUrl) {
+        //     Alert.alert('Please Upload Image')
+        // } else {
+        //     Alert.alert(
+        //         '',
+        //         "Kindly ensure it's your actual picture preferably a formal one, for better curation.",
 
-        if (!imageUrl) {
-            Alert.alert('Please Upload Image')
-        } else {
-            Alert.alert(
-                '',
-                "Kindly ensure it's your actual picture preferably a formal one, for better curation.",
-
-                [{ text: 'Next', onPress: () => handleImageUpload(imageUrl) }, { text: 'Cancel' }],
-                {
-                    cancelable: true,
-                }
-            )
-        }
+        //         [{ text: 'Next', onPress: () => handleImageUpload(imageUrl) }, { text: 'Cancel' }],
+        //         {
+        //             cancelable: true,
+        //         }
+        //     )
+        // }
     }
 
     return (
         <Animated.View exiting={SlideInLeft} entering={SlideInRight} style={tw`flex-1 items-center justify-center relative`}>
             <LinearGradient colors={colors.gradient_blue} style={tw`flex-1 items-center h-full w-full relative`}>
                 <View style={tw`w-full`}>
-                    <BackButton />
+                    <BackButton extra={'m-3 ml-5'} />
 
                     <View style={tw`mt-20 mb-6`}>
                         <Text style={tw`text-white text-3xl font-semibold text-center`}>Liscence Image</Text>
@@ -70,8 +70,8 @@ function ProfilePic() {
                         </>
                     </TouchableOpacity>
                     <View style={tw`flex-row items-center justify-between w-full pt-6`}>
-                        <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} />
-                        <PrimaryButton text={"Continue"} onPress={() => navigation.navigate('HomeScreen')} />
+                        <SecondaryButton disabled={!navigator.canGoBack()} text={'Back'} onPress={() => navigator.goBack()} extra='my-6' />
+                        <PrimaryButton text={"Continue"} onPress={handleNext} extra=' my-6' />
                     </View>
                 </View>
 

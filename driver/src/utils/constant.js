@@ -1,14 +1,23 @@
 import ImagePicker from 'react-native-image-crop-picker'
 import RNLocation from 'react-native-location'
 import { setCurrentLocation } from '../slices/travelSlice';
+// import jwt_decode from "jwt-decode";
+import { useState } from 'react';
+import { useEffect } from 'react';
+import { getLocation } from '../hooks';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+
 RNLocation.configure({
     distanceFilter: 1
 });
+
 export const colors = {
-    blue: '#0096FF',
+    blue: '#007FFF',
+    white: "#FFF",
     black: '#222',
     white: '#fff',
-    light_grey: "#D1D1D1",
+    light_grey: "#F5F5F5",
+    grey: "#999",
     yellow: "#F0BA2B",
     red: "#FA5805",
     gradient_blue: ['#007FFF', '#007FFF', '#0CAFFF', '#0CAFFF'],
@@ -17,9 +26,36 @@ export const colors = {
 
 }
 
+export const decodeToken = async () => {
+    const jwtToken = await AsyncStorage.getItem("raahi__token");
+
+    if (!jwtToken) {
+        return false;
+    }
+    var decoded = jwt_decode(jwtToken);
+    return decoded?.userInfo
+}
+
+
+// export const groupBy = (x, f) => x.reduce((a, b) => ((a[f(b)] ||= []).push(b), a), {});
+
+
+export default function useDebounce(value, delay = 300) {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value)
+        }, delay);
+        return () => {
+            clearTimeout(handler);
+        }
+    }, [value, delay]);
+
+    return debouncedValue;
+}
 
 export const PickImage = async (Location) => {
-    console.log(Location)
     if (Location == 'Liscence') {
 
         let TestPromise = new Promise((resolve, reject) => {
@@ -89,5 +125,14 @@ export const refetchLocation = async (dispatch) => {
     } else {
         location = await RNLocation.getLatestLocation({ timeout: 10000 })
     }
+
+    if (location) {
+        let place = await getLocation({ lat: location?.latitude, long: location?.longitude });
+        place = place.data?.results[0]?.formatted_address
+
+        let newLocation = { "description": place, "location": { "lat": location?.latitude, "lng": location?.longitude } }
+        location = newLocation
+    }
+
     dispatch(setCurrentLocation(location))
 }

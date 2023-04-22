@@ -3,13 +3,13 @@ import React, { useEffect, useRef } from "react";
 import {
     selectDestination,
     selectOrigin,
-    setTravelInfo,
 } from "../slices/travelSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import { GOOGLE_MAPS_API_KEY } from "../services/config";
+import { GOOGLE_MAP_API_KEY } from "../services/config";
 import MapViewDirections from "react-native-maps-directions";
-import tw from "twrnc";
+import { StyleSheet } from "react-native";
+import { useGetTravelTime } from "../hooks";
 
 const Map = () => {
     const dispatch = useDispatch();
@@ -25,68 +25,74 @@ const Map = () => {
         });
     }, [origin, destination]);
 
+    let { isLoading, mutate } = useGetTravelTime({ origin, destination })
+
     useEffect(() => {
         if (!origin || !destination) return;
+        if (origin && destination) {
+            mutate()
+        }
+    }, [origin, destination, GOOGLE_MAP_API_KEY]);
 
-        const getTravelTime = async () => {
-            const url = `https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=${origin.description}&destinations=${destination.description}&key=${GOOGLE_MAPS_API_KEY}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            dispatch(setTravelInfo(data.rows[0].elements[0]));
-        };
+    return (
+        <MapView
+            ref={mapRef}
+            style={styles.map}
+            initialRegion={{
+                latitude: origin?.location?.lat || 27.594594594594593,
+                longitude: origin?.location?.lng || 78.01532460294433,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            }}
+            mapType="terrain"
+        >
+            {origin && destination && (
+                <MapViewDirections
+                    origin={origin?.description}
+                    destination={destination?.description}
+                    apikey={GOOGLE_MAP_API_KEY}
+                    strokeWidth={3}
+                    strokeColor="black"
+                />
+            )}
 
-        getTravelTime();
-    }, [origin, destination, GOOGLE_MAPS_API_KEY]);
+            {origin?.location && (
+                <Marker
+                    coordinate={{
+                        latitude: origin?.location?.lat,
+                        longitude: origin?.location?.lng,
+                    }}
+                    title="Origin"
+                    description={origin?.description}
+                    identifier="origin"
+                />
+            )}
 
-    return<></>
-    // return (
-    //     <MapView
-    //         ref={mapRef}
-    //         initialRegion={{
-    //             latitude: origin?.location?.lat || 37.78825,
-    //             longitude: origin?.location?.lng || -122.4324,
-    //             latitudeDelta: 0.005,
-    //             longitudeDelta: 0.005,
-    //         }}
-    //         mapType="mutedStandard"
-    //         style={tw`flex-1 bg-red-100`}
-    //     >
-    //         {origin && destination && (
-    //             <MapViewDirections
-    //                 origin={origin?.description}
-    //                 destination={destination?.description}
-    //                 apikey={GOOGLE_MAPS_API_KEY}
-    //                 strokeWidth={3}
-    //                 strokeColor="blue"
-    //                 lineDashPattern={[0]}
-    //             />
-    //         )}
-
-    //         {origin?.location && (
-    //             <Marker
-    //                 coordinate={{
-    //                     latitude: origin?.location?.lat,
-    //                     longitude: origin?.location?.lng,
-    //                 }}
-    //                 title="Origin"
-    //                 description={origin?.description}
-    //                 identifier="origin"
-    //             />
-    //         )}
-
-    //         {destination?.location && (
-    //             <Marker
-    //                 coordinate={{
-    //                     latitude: destination?.location?.lat,
-    //                     longitude: destination?.location?.lng,
-    //                 }}
-    //                 title="Destination"
-    //                 description={destination?.description}
-    //                 identifier="destination"
-    //             />
-    //         )}
-    //     </MapView>
-    // );
+            {destination?.location && (
+                <Marker
+                    coordinate={{
+                        latitude: destination?.location?.lat,
+                        longitude: destination?.location?.lng,
+                    }}
+                    title="Destination"
+                    description={destination?.description}
+                    identifier="destination"
+                />
+            )}
+        </MapView>
+    );
 };
 
 export default Map;
+
+const styles = StyleSheet.create({
+    container: {
+        ...StyleSheet.absoluteFillObject,
+        flex: 1, //the container will fill the whole screen.
+        justifyContent: "flex-end",
+        alignItems: "center",
+    },
+    map: {
+        ...StyleSheet.absoluteFillObject,
+    },
+});

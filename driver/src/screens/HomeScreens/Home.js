@@ -6,12 +6,9 @@ import Svg, { Path } from 'react-native-svg'
 import tw from 'twrnc'
 import { useDispatch, useSelector } from 'react-redux'
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-// import { setOrigin, setDestination } from '../../slices/travelSlice'
 import { GOOGLE_MAP_API_KEY } from '../../services/config'
 import Map from '../../components/Map'
-import MapView from 'react-native-maps'
-import { selectCurrentLocation, selectDestination, selectOrigin, setDestination, setOrigin } from '../../slices/travelSlice'
-
+import { selectCurrentLocation, selectDestination, selectOrigin, selectTravelTimeInfo, setDestination, setOrigin } from '../../slices/travelSlice'
 
 
 const Search = ({ style }) => (
@@ -24,15 +21,14 @@ const Search = ({ style }) => (
 function Home() {
   const dispatch = useDispatch();
   const currentLocation = useSelector(selectCurrentLocation);
-  const origin = useSelector(selectOrigin);
-  const destination = useSelector(selectDestination)
-
+  const destination = useSelector(selectDestination);
+  const travelInfo = useSelector(selectTravelTimeInfo)
 
   return (
     <Animated.View entering={FadeIn.duration(500)} style={tw`flex-1 bg-white`}>
 
       <Animated.View entering={SlideInUp.duration(500)} style={tw`pt-4 flex-row items-center justify-between relative z-10`}>
-        <View style={tw`flex-1 absolute top-4 left-0 z-10 px-2`}>
+        <View style={tw`flex-1 absolute top-4 left-0 z-10 px-2 w-full`}>
           <GooglePlacesAutocomplete
             nearbyPlacesAPI="GooglePlacesSearch"
             debounce={400}
@@ -41,12 +37,6 @@ function Home() {
             minLength={2}
             fetchDetails={true}
             onPress={(data, details = null) => {
-              // dispatch(
-              //   setOrigin({
-              //     location: details?.geometry.location,
-              //     description: data?.description,
-              //   })
-              // );
               dispatch(setDestination({
                 location: details?.geometry.location,
                 description: data?.description,
@@ -66,7 +56,7 @@ function Home() {
             styles={{
               container: {
                 flex: 1,
-              }
+              },
             }}
             renderRow={(rowData) => {
               return (
@@ -82,33 +72,24 @@ function Home() {
         </View>
 
         <View style={tw`flex-1 h-12`}></View>
-        <TouchableOpacity activeOpacity={0.9} style={tw`bg-white px-4`}>
+        <TouchableOpacity activeOpacity={0.9} style={tw`bg-white px-4 z-20`}>
           <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
             uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
           }} />
         </TouchableOpacity>
 
       </Animated.View>
-      <View style={tw`px-4 py-2 bg-blue-50`}>
-        <Text>Destination : </Text>
-        <Text>{destination?.location?.lat} , {destination?.location?.lng}</Text>
-        <Text style={tw`mt-2`}>My Location :</Text>
-        <Text>{currentLocation?.latitude} , {currentLocation?.longitude}</Text>
-      </View>
+
+      {
+        travelInfo ?
+          <View style={tw`px-4 py-4 bg-blue-50`}>
+            <Text style={tw`text-base`}>Expected Travel Time: {travelInfo?.duration?.text}</Text>
+            <Text style={tw`mt-2 text-base`}>Expected Travel Distance: {travelInfo?.distance?.text}</Text>
+          </View>
+          :
+          <></>
+      }
       <View style={tw`flex-1 items-center justify-start bg-blue-50`}>
-        <MapView
-          style={styles.map}
-          initialRegion={{
-            latitude: currentLocation?.latitude || 27.594594594594593,
-            longitude: currentLocation?.longitude || 78.01532460294433,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
-        />
-        {/* <Image
-          style={{ width: 360, height: 300 }}
-          source={require('../../assets/images/ComingSoon.gif')}
-        /> */}
         <Map />
       </View>
     </Animated.View>

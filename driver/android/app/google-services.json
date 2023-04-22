@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "244541041800",
-    "project_id": "raahi-app",
-    "storage_bucket": "raahi-app.appspot.com"
+    "project_number": "546282582667",
+    "project_id": "my-raahi",
+    "storage_bucket": "my-raahi.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:244541041800:android:73964d22a3fbb6fc2cc33d",
+        "mobilesdk_app_id": "1:546282582667:android:98f1d899b565dcb000da8e",
         "android_client_info": {
           "package_name": "com.raahi"
         }
       },
       "oauth_client": [
         {
-          "client_id": "244541041800-msnaru8n0nme4sbm0qfvic8danq2nj90.apps.googleusercontent.com",
+          "client_id": "546282582667-c4ramhk2qivhr7d1ltn4t3d8pts7psgb.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAo61HMyt4whkclVsea9jwfXRwUjnQJ66s"
+          "current_key": "AIzaSyCkpQ5bGSYLVQCT7tW9ZQ3MNdIqhmEoGW4"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "244541041800-msnaru8n0nme4sbm0qfvic8danq2nj90.apps.googleusercontent.com",
+              "client_id": "546282582667-c4ramhk2qivhr7d1ltn4t3d8pts7psgb.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

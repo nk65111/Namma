@@ -24,7 +24,7 @@ function IntroScreen() {
           <Text style={tw`text-4xl font-medium text-white`}>Find Your</Text>
           <Text style={tw`text-5xl font-medium text-white`}>Travel Buddy</Text>
           <Text style={tw`text-lg font-medium text-white my-2`}>Join with Raahi and make your travel easy and efficient</Text>
-          <PrimaryButton onPress={() => navigation.navigate('Login')} text={'Get Started'} />
+          <PrimaryButton onPress={() => navigation.navigate('Login')} text={'Get Started'} extra=' my-6' />
         </View>
       </LinearGradient>
     </Animated.View>

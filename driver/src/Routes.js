@@ -2,28 +2,22 @@ import React, { useEffect, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { useReduxDevToolsExtension } from '@react-navigation/devtools'
 import Splash from './screens/Splash'
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import Home from './screens/HomeScreens/Home'
 import IntroScreen from './screens/IntroScreen'
-import Svg, { Path } from 'react-native-svg'
-import MyTabBar from './TabBar'
 import { createStackNavigator } from '@react-navigation/stack'
 import Login from './screens/AuthScreens/Login'
 import OTPScreen from './screens/AuthScreens/OTPScreen'
 import AboutYou from './screens/AuthScreens/AboutYou'
 import ProfilePic from './screens/AuthScreens/ProfilePic'
 import LiscencePic from './screens/AuthScreens/LiscencePic'
-import tw from 'twrnc'
-import MyProfile from './screens/HomeScreens/MyProfile'
-import ComingSoon from './screens/ComingSoon'
-import ComingSoon2 from './screens/ComingSoon2'
-import ComingSoon3 from './screens/ComingSoon3'
 
 import RNLocation from 'react-native-location';
 import { useDispatch } from 'react-redux'
-import { setCurrentLocation } from './slices/travelSlice'
+import { setCurrentLocation, setRides } from './slices/travelSlice'
 import { refetchLocation } from './utils/constant'
 import NavigatorTab from './NavigatorTab'
+import OneDayRides from './screens/Rides/OneDayRides'
+import ScheduleRide from './screens/Rides/ScheduleRide'
+import { ridesData } from './utils/routeData'
 
 RNLocation.configure({
   distanceFilter: 1
@@ -37,6 +31,11 @@ function Routes() {
   const [jumpScreen, setJumpScreen] = React.useState('IntroScreen')
   const [loading, setLoading] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
+
+  useEffect(() => {
+    dispatch(setRides(ridesData))
+  }, [])
+
 
 
   const permissionHandle = async () => {
@@ -62,10 +61,10 @@ function Routes() {
         }
       })
       location = await RNLocation.getLatestLocation({ timeout: 10000 });
-      setUserLocation(location );
+      setUserLocation(location);
     } else {
       location = await RNLocation.getLatestLocation({ timeout: 10000 })
-      setUserLocation(location );
+      setUserLocation(location);
     }
     dispatch(setCurrentLocation(location))
   }
@@ -98,11 +97,6 @@ function Routes() {
         headerShown: false,
       }} initialRouteName={routename}>
         <>
-          {/* <AuthStackNavigator.Group screenOptions={{
-            presentation: 'modal',
-            animation: 'slide_from_right'
-          }}>
-          </AuthStackNavigator.Group> */}
           <AuthStackNavigator.Screen name="IntroScreen" component={IntroScreen} />
           <AuthStackNavigator.Screen name="Login" component={Login} />
           <AuthStackNavigator.Screen name="OTP" component={OTPScreen} />
@@ -110,6 +104,13 @@ function Routes() {
           <AuthStackNavigator.Screen name="ProfilePic" component={ProfilePic} />
           <AuthStackNavigator.Screen name="LiscencePic" component={LiscencePic} />
           <AuthStackNavigator.Screen name="HomeScreen" component={NavigatorTab} />
+          <AuthStackNavigator.Group screenOptions={{
+            presentation: 'modal',
+            animation: 'slide_from_right'
+          }}>
+            <AuthStackNavigator.Screen name="Schedule" component={ScheduleRide} />
+            <AuthStackNavigator.Screen name="OneDayRides" component={OneDayRides} />
+          </AuthStackNavigator.Group>
         </>
       </AuthStackNavigator.Navigator>
     )

@@ -3,37 +3,36 @@ import { Provider } from 'react-redux'
 import store from './src/utils/store'
 import './src/utils/ignore'
 import { Alert, BackHandler, Keyboard, Linking, Platform, SafeAreaView, Text, TouchableWithoutFeedback } from 'react-native'
-// import { notificationListener, requestUserPermission } from './src/utils/notificationService'
+import { notificationListener, requestUserPermission } from './src/utils/notificationService'
 import VersionCheck from 'react-native-version-check'
-// import PushNotification from 'react-native-push-notification'
+import PushNotification from 'react-native-push-notification'
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Routes from './src/Routes'
 import Splash from './src/screens/Splash'
 import { NativeBaseProvider, KeyboardAvoidingView } from "native-base";
-import MyProfile from './src/screens/HomeScreens/MyProfile'
 
 const App = () => {
 
   const queryClient = new QueryClient()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const disableBackButton = () => {
     return true
   }
 
-  // const createChannels = () => {
-  //   PushNotification.createChannel({
-  //     channelId: 'rekindle',
-  //     channelName: 'rekindle'
-  //   })
-  // }
+  const createChannels = () => {
+    PushNotification.createChannel({
+      channelId: 'raahi',
+      channelName: 'raahi'
+    })
+  }
 
 
-  // useEffect(() => {
-  //   checkUpdateNeeded()
-  //   BackHandler.addEventListener('hardwareBackPress', disableBackButton)
-  //   return BackHandler.removeEventListener('hardwareBackPress', disableBackButton)
-  // }, [])
+  useEffect(() => {
+    // checkUpdateNeeded()
+    BackHandler.addEventListener('hardwareBackPress', disableBackButton)
+    return BackHandler.removeEventListener('hardwareBackPress', disableBackButton)
+  }, [])
 
   const checkUpdateNeeded = async () => {
     let updateNeeded = await VersionCheck.needUpdate()
@@ -52,13 +51,10 @@ const App = () => {
   }
 
 
-  // setTimeout(() => setLoading(false), 5000)
-
   useEffect(() => {
-
-    // requestUserPermission();
-    // notificationListener();
-    // createChannels()
+    requestUserPermission();
+    notificationListener();
+    createChannels();
   }, [])
 
 

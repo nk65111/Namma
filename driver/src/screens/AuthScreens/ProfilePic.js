@@ -50,7 +50,7 @@ function ProfilePic() {
         <Animated.View exiting={SlideInLeft} entering={SlideInRight} style={tw`flex-1 items-center justify-center relative`}>
             <LinearGradient colors={colors.gradient_blue} style={tw`flex-1 items-center h-full w-full relative`}>
                 <View style={tw`w-full`}>
-                    <BackButton />
+                    <BackButton extra={'m-3 ml-5'} />
 
                     <View style={tw`mt-20 mb-6`}>
                         <Text style={tw`text-white text-3xl font-semibold text-center`}>Profile Picture</Text>
@@ -70,8 +70,8 @@ function ProfilePic() {
                         </>
                     </TouchableOpacity>
                     <View style={tw`flex-row items-center justify-between w-full pt-6`}>
-                        <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} />
-                        <PrimaryButton text={"Continue"} onPress={() => navigation.navigate('LiscencePic')} />
+                        <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} extra='my-6' />
+                        <PrimaryButton text={"Continue"} onPress={() => navigation.navigate('LiscencePic')} extra='my-6' />
                     </View>
                 </View>
 

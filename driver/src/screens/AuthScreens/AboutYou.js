@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
 import { Box, FormControl, Input, Stack } from 'native-base'
-import React from 'react'
+import React, { useState } from 'react'
 import { Text, View } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
@@ -12,11 +12,17 @@ import { colors } from '../../utils/constant'
 
 function AboutYou() {
     const navigation = useNavigation()
+    const [formData, setFormData] = useState({
+        name: '',
+        liscenceNumber: '',
+        vehicleNumber: '',
+        vehicleModel: ''
+    })
     return (
         <Animated.View exiting={SlideInLeft} entering={SlideInRight} style={tw`flex-1 items-center justify-center relative`}>
             <LinearGradient colors={colors.gradient_blue} style={tw`flex-1 items-center h-full w-full relative`}>
                 <View style={tw`w-full`}>
-                    <BackButton />
+                    <BackButton extra={'m-3 ml-5'} />
 
                     <View style={tw`mt-20 mb-6`}>
                         <Text style={tw`text-white text-3xl font-semibold text-center`}>Add Your Details</Text>
@@ -28,7 +34,7 @@ function AboutYou() {
                         <FormControl isRequired>
                             <Stack mx="4">
                                 <FormControl.Label>Your Name</FormControl.Label>
-                                <Input placeholder="Name" style={tw`p-2 text-base ios:mb-2`} />
+                                <Input placeholder="Name" value={formData?.name} onChangeText={(txt) => setFormData({ ...formData, name: txt })} style={tw`p-2 text-base ios:mb-2`} />
                                 <FormControl.ErrorMessage>
                                     Name must contain only letters
                                 </FormControl.ErrorMessage>
@@ -39,7 +45,7 @@ function AboutYou() {
                         <FormControl isRequired>
                             <Stack mx="4">
                                 <FormControl.Label>Driving Liscence Number</FormControl.Label>
-                                <Input placeholder="DL14 20110012345" style={tw`p-2 text-base ios:mb-2`} />
+                                <Input placeholder="DL14 20110012345" maxLength={16} value={formData?.liscenceNumber} onChangeText={(txt) => setFormData({ ...formData, liscenceNumber: txt })} style={tw`p-2 text-base ios:mb-2`} />
                                 <FormControl.ErrorMessage>
                                     Invalid Format
                                 </FormControl.ErrorMessage>
@@ -50,7 +56,7 @@ function AboutYou() {
                         <FormControl isRequired>
                             <Stack mx="4">
                                 <FormControl.Label>Vehicle Register Number</FormControl.Label>
-                                <Input placeholder="TN 75 AA 7106" style={tw`p-2 text-base ios:mb-2`} />
+                                <Input placeholder="TN 75 AA 7106" maxLength={10} value={formData?.vehicleNumber} onChangeText={(txt) => setFormData({ ...formData, vehicleNumber: txt })} style={tw`p-2 text-base ios:mb-2`} />
                                 <FormControl.ErrorMessage>
                                     Invalid Format
                                 </FormControl.ErrorMessage>
@@ -61,7 +67,7 @@ function AboutYou() {
                         <FormControl isRequired>
                             <Stack mx="4">
                                 <FormControl.Label>Vehicle Model</FormControl.Label>
-                                <Input placeholder="Honda Civic " style={tw`p-2 text-base ios:mb-2`} />
+                                <Input placeholder="Honda Civic" value={formData?.vehicleModel} onChangeText={(txt) => setFormData({ ...formData, vehicleModel: txt })} style={tw`p-2 text-base ios:mb-2`} />
                                 <FormControl.ErrorMessage>
                                     Invalid Format
                                 </FormControl.ErrorMessage>
@@ -70,8 +76,8 @@ function AboutYou() {
                     </Box>
 
                     <View style={tw`flex-row items-center justify-between w-full pt-1`}>
-                        <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} />
-                        <PrimaryButton text={"Continue"} onPress={() => navigation.navigate('ProfilePic')} />
+                        <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} extra='my-6' />
+                        <PrimaryButton text={"Continue"} onPress={() => navigation.navigate('ProfilePic')} extra=' my-6' />
                     </View>
                 </View>
 
