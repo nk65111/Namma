@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.event.PublicInvocationEvent;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -29,14 +30,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.namma.api.config.JwtUtil;
 import com.namma.api.dto.DriverDto;
 import com.namma.api.dto.DriverKycDto;
+import com.namma.api.dto.DriverLocationDto;
 import com.namma.api.dto.JwtRequest;
 import com.namma.api.dto.JwtResponse;
+import com.namma.api.dto.RideDto;
 import com.namma.api.entity.Auth;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.security.CustomUserDetails;
 import com.namma.api.services.AbstractUserDetailsService;
 import com.namma.api.services.DriverService;
+import com.namma.api.services.RideService;
 
 @RestController
 @RequestMapping("/api/v1/driver")
@@ -53,6 +57,9 @@ public class DriverController {
 
     @Autowired
     private AbstractUserDetailsService abstractUserDetailsService;
+    
+    @Autowired
+    private RideService rideService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -80,9 +87,10 @@ public class DriverController {
 
 
     @GetMapping("/current-user")
-    public ResponseEntity<Auth> getCurrentUser(Principal principal){
+    public ResponseEntity<?> getCurrentUser(Principal principal) throws ResourceNotFoundException{
        Auth auth= getAuthByJwt(principal);
-       return new ResponseEntity<Auth>(auth,HttpStatus.OK);
+     DriverDto driverDto=  this.driverService.getProfile(auth.getId());
+       return new ResponseEntity<>(driverDto,HttpStatus.OK);
     }
 	
     public void authentication(String username,String password) throws Exception {
@@ -107,10 +115,12 @@ public class DriverController {
     @PostMapping("/kyc")
     public ResponseEntity<String> kyc(@RequestParam("kycData") String  kycData,
     		@RequestParam("drivingLicenceImage") MultipartFile drivingLicenceImage,
-    		@RequestParam("selfieImage") MultipartFile selfieImage) 
+    		@RequestParam("selfieImage") MultipartFile selfieImage, Principal principal) 
     				throws JsonMappingException, JsonProcessingException, ResourceNotFoundException {
     	
     	DriverKycDto driverKycDto=mapper.readValue(kycData, DriverKycDto.class);
+    	Auth auth=getAuthByJwt(principal);
+    	driverKycDto.setAuthId(auth.getId());
     	driverKycDto.setDrivingLicenceImage(drivingLicenceImage);
     	driverKycDto.setSelfieImage(selfieImage);
     	driverService.registerDriverKyc(driverKycDto);
@@ -118,9 +128,10 @@ public class DriverController {
         return new ResponseEntity<String>("Driver KYC details saved successfully", HttpStatus.CREATED);
     }
     
-    @GetMapping("/kyc/{authId}")
-    public ResponseEntity<DriverKycDto> getDriverKyc(@PathVariable("authId") Long authId) throws ResourceNotFoundException{
-    	DriverKycDto driverKycDto= driverService.getDriverKycDetails(authId);
+    @GetMapping("/kyc")
+    public ResponseEntity<DriverKycDto> getDriverKyc(Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	DriverKycDto driverKycDto= driverService.getDriverKycDetails(auth.getId());
     	return new ResponseEntity<>(driverKycDto,HttpStatus.OK);
     }
     
@@ -139,6 +150,13 @@ public class DriverController {
 		return new ResponseEntity<>("Profile updated successfully", HttpStatus.OK); 
 	}
     
+    @GetMapping("ride/history-ride")
+    public ResponseEntity<List<RideDto>> getAllCompleteRideByCutomer(@RequestParam("isCompleted") Boolean isCompleted,Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	List<RideDto> rideDtos= this.rideService.getAllCompleteRideByDriver(auth.getId(), isCompleted);
+    	return new ResponseEntity<List<RideDto>>(rideDtos,HttpStatus.OK);
+    }
+    
     @DeleteMapping("/delete-profile")
     public ResponseEntity<String> deleteProfile(Principal principal) throws ResourceNotFoundException{
     	
@@ -146,5 +164,14 @@ public class DriverController {
     	
     	driverService.deleteProfile(auth.getId());
     	return new ResponseEntity<String>("Profile updated successfully", HttpStatus.OK);
+    }
+    
+    @PutMapping("/update-location")
+    public ResponseEntity<String> updateDriverLocation(@RequestBody DriverLocationDto driverLocationDto,Principal principal) throws ResourceNotFoundException {
+    	Auth auth=getAuthByJwt(principal);
+        driverLocationDto.setDrivingId(auth.getId());
+        System.out.println(driverLocationDto);
+        this.driverService.updateDriverLocation(driverLocationDto);
+        return new ResponseEntity<>("Location Updated Successfully",HttpStatus.OK);
     }
 }

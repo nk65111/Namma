@@ -1,7 +1,7 @@
 package com.namma.api.controllers;
 
 import java.security.Principal;
-import java.util.HashMap;
+
 import java.util.List;
 
 import javax.validation.Valid;
@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,11 +26,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.namma.api.config.JwtUtil;
+import com.namma.api.config.SheduleRide;
 import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.JwtRequest;
 import com.namma.api.dto.JwtResponse;
 import com.namma.api.dto.RideDto;
 import com.namma.api.entity.Auth;
+import com.namma.api.entity.Customer;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.security.CustomUserDetails;
 import com.namma.api.services.AbstractUserDetailsService;
@@ -56,6 +59,9 @@ public class CustomerController {
     @Autowired
     private JwtUtil jwtUtil;
     
+    @Autowired 
+    private SheduleRide sheduleRide;
+    
     @Autowired
 	private RideService rideService;
 	
@@ -65,11 +71,15 @@ public class CustomerController {
 		return new ResponseEntity<String>("OTP generated successfully", HttpStatus.OK);
 	}
 	
-	@PostMapping("/book")
-	public ResponseEntity<String> bookride(@RequestBody RideDto rideDto) throws ResourceNotFoundException{
+	@PostMapping("/ride/book")
+	public ResponseEntity<String> bookride(@RequestBody RideDto rideDto,Principal principal) throws ResourceNotFoundException{
+		Auth auth=getAuthByJwt(principal);
+		rideDto.setUserId(auth.getId());
 		this.rideService.addRide(rideDto);
 		return new ResponseEntity<String>("Ride booked successfully", HttpStatus.CREATED);
 	}
+	
+	
 	
     @PostMapping("/verifyOtp")
     public ResponseEntity<?> genrateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
@@ -82,7 +92,7 @@ public class CustomerController {
 
         UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
-       
+        
         return  ResponseEntity.ok(new JwtResponse(token));
     }
     
@@ -112,6 +122,36 @@ public class CustomerController {
     	customerService.deleteProfile(auth.getId());
     	return new ResponseEntity<String>("Profile delete successfully", HttpStatus.OK);
     }
+    
+    
+    @PutMapping("/ride/update-book")
+    public ResponseEntity<String> updateRide(@RequestBody RideDto rideDto,Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	rideDto.setUserId(auth.getId());
+    	this.rideService.updateRide(rideDto);;
+    	return new ResponseEntity<String>("Ride update sucessfully",HttpStatus.OK);
+    }
+    
+    @GetMapping("ride/get-completed-ride")
+    public ResponseEntity<List<RideDto>> getAllCompleteRideByCutomer(@RequestParam("isCompleted") Boolean isCompleted,Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	List<RideDto> rideDtos= this.rideService.getAllCompleteRideByUser(auth.getId(), isCompleted);
+    	return new ResponseEntity<List<RideDto>>(rideDtos,HttpStatus.OK);
+    }
+    
+    @PostMapping("/ride/start-searching-ride")
+    public void StartSearchingRide(Principal principal) {
+    	Auth auth=getAuthByJwt(principal);
+        this.sheduleRide.customer=(Customer)auth;
+    }
+    
+    @DeleteMapping("/ride/delete-book/{date}")
+    public ResponseEntity<String> deleteRide(@PathVariable("date") String date,Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	
+    	this.rideService.deleteRide(date,auth.getId());
+    	return new ResponseEntity<String>("Ride delete successfully",HttpStatus.OK); 
+    }
 	
     public void authentication(String username,String password) throws Exception {
         try {
@@ -129,5 +169,8 @@ public class CustomerController {
     	CustomUserDetails userDetails= (CustomUserDetails)this.userDetailsServiceImpl.loadUserByUsername(principal.getName());
     	return userDetails.getAuth();
     }
+    
+    
+    
     
 }
