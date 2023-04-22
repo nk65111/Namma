@@ -1,3 +1,1 @@
-export const GOOGLE_MAP_API_KEY= 'AIzaSyAODVzhnS0ZaDrc_jx6uTRLezLFNycelHc'
-export const GOOGLE_MAP_API_KEY1= 'AIzaSyAm1u4-56OsJl9AStuqqWsKcMVbSqlkIi8'
-export const GOOGLE_MAP_API_KEY2= 'AIzaSyB2nqmpFzNMOMtEaJE7z5kIWrC9O8GEgzw'
+export const GOOGLE_MAP_API_KEY= 'API_KEY'
