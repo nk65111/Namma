@@ -5,7 +5,6 @@ import { setCurrentLocation } from '../slices/travelSlice';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { getLocation } from '../hooks';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 
 RNLocation.configure({
     distanceFilter: 1
@@ -127,12 +126,16 @@ export const refetchLocation = async (dispatch) => {
     }
 
     if (location) {
-        let place = await getLocation({ lat: location?.latitude, long: location?.longitude });
-        place = place.data?.results[0]?.formatted_address
+        // let newLocation = { "description": "", "location": { "lat": location?.latitude, "lng": location?.longitude } }
+        // location = newLocation;
+        dispatch(setCurrentLocation({ "description": "", "location": { "lat": location?.latitude, "lng": location?.longitude } }))
 
-        let newLocation = { "description": place, "location": { "lat": location?.latitude, "lng": location?.longitude } }
-        location = newLocation
+        let place = await getLocation({ lat: location?.latitude, long: location?.longitude });
+        place = place.data?.results[0]?.formatted_address;
+        dispatch(setCurrentLocation({ "description": place || "", "location": { "lat": location?.latitude, "lng": location?.longitude } }))
+        // location.description = place
+
+        // dispatch(setCurrentLocation(location))
     }
 
-    dispatch(setCurrentLocation(location))
 }

@@ -41,15 +41,15 @@ const Map = () => {
             initialRegion={{
                 latitude: origin?.location?.lat || 27.594594594594593,
                 longitude: origin?.location?.lng || 78.01532460294433,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
+                latitudeDelta: 0.05,
+                longitudeDelta: 0.05,
             }}
             mapType="terrain"
         >
             {origin && destination && (
                 <MapViewDirections
-                    origin={origin?.description}
-                    destination={destination?.description}
+                    origin={{ latitude: origin?.location?.lat, longitude: origin?.location?.lng }}
+                    destination={{ latitude: destination?.location?.lat, longitude: destination?.location?.lng }}
                     apikey={GOOGLE_MAP_API_KEY}
                     strokeWidth={3}
                     strokeColor="black"
@@ -93,6 +93,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     map: {
+        marginTop: -40,
+        marginBottom: -20,
         ...StyleSheet.absoluteFillObject,
     },
 });

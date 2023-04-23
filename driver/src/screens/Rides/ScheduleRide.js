@@ -38,6 +38,8 @@ function ScheduleRide({ route, navigation }) {
 
   let ride = route?.params?.ride
   const dispatch = useDispatch()
+  const [initialStartName, setInitialStartName] = useState(ride?.pickUpLocation?.name || '')
+  const [initialEndName, setInitialEndName] = useState(ride?.dropLocation?.name || '')
   const [step, setStep] = useState(ride || 1)
   const navigator = useNavigation();
   const today = new Date();
@@ -49,8 +51,6 @@ function ScheduleRide({ route, navigation }) {
   const [end, setEnd] = useState(ride ? { description: ride?.pickUpLocation?.name || '', location: { "lat": ride?.pickUpLocation?.lat, "lng": ride?.pickUpLocation?.lng } } : null)
   const [start, setStart] = useState(ride ? { description: ride?.dropLocation?.name || '', location: { "lat": ride?.dropLocation?.lat, "lng": ride?.dropLocation?.lng } } : null)
   const [pickUp, setPickUp] = useState(ride?.pickUpTime || null);
-  const [initialStartName, setInitialStartName] = useState(ride?.pickUpLocation?.name || '')
-  const [initialEndName, setInitialEndName] = useState(ride?.dropLocation?.name || '')
 
 
   const isCurrentDay = (day) =>
@@ -189,7 +189,8 @@ function ScheduleRide({ route, navigation }) {
                   }}
                   query={{
                     key: GOOGLE_MAP_API_KEY,
-                    language: "en",
+                    language: 'en',
+                    components: 'country:in'
                   }}
                   style={tw`text-base text-black`}
                   textInputProps={{
@@ -242,6 +243,7 @@ function ScheduleRide({ route, navigation }) {
                   query={{
                     key: GOOGLE_MAP_API_KEY,
                     language: "en",
+                    components: 'country:in'
                   }}
                   style={tw`text-base text-black`}
                   textInputProps={{

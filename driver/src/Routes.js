@@ -18,6 +18,7 @@ import NavigatorTab from './NavigatorTab'
 import OneDayRides from './screens/Rides/OneDayRides'
 import ScheduleRide from './screens/Rides/ScheduleRide'
 import { ridesData } from './utils/routeData'
+import { getLocation } from './hooks'
 
 RNLocation.configure({
   distanceFilter: 1
@@ -28,7 +29,7 @@ function Routes() {
 
   const navigationRef = React.useRef()
   useReduxDevToolsExtension(navigationRef)
-  const [jumpScreen, setJumpScreen] = React.useState('IntroScreen')
+  const [jumpScreen, setJumpScreen] = React.useState('HomeScreen')
   const [loading, setLoading] = useState(false)
   const [userLocation, setUserLocation] = useState(null)
 
@@ -66,7 +67,13 @@ function Routes() {
       location = await RNLocation.getLatestLocation({ timeout: 10000 })
       setUserLocation(location);
     }
-    dispatch(setCurrentLocation(location))
+    if (location) {
+      dispatch(setCurrentLocation({ "description": "", "location": { "lat": location?.latitude, "lng": location?.longitude } }));
+      let place = await getLocation({ lat: location?.latitude, long: location?.longitude });
+      place = place.data?.results[0]?.formatted_address;
+      console.log("place ", place)
+      dispatch(setCurrentLocation({ "description": place || "", "location": { "lat": location?.latitude, "lng": location?.longitude } }))
+    }
   }
 
   useEffect(() => { permissionHandle() }, [])
