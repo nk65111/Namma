@@ -1,27 +1,29 @@
 package com.namma.api.repository;
 
+
+
+import java.time.Instant;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
+
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.namma.api.entity.Customer;
 import com.namma.api.entity.Driver;
 import com.namma.api.entity.Ride;
 
 public interface RideRepository extends JpaRepository<Ride, Long>{
-   Optional<Ride> findByCustomerAndDateAndIsReturn(Customer customer,String Date,Boolean isReturn);
    
-   List<Ride> findByCustomerAndIsCompleted(Customer customer,Boolean isCompleted);
+   List<Ride> findByCustomerOrderByDateAsc(Customer customer);
    
-   List<Ride> findByDriverAndIsCompleted(Driver driver,Boolean isCOmpleted);
+   List<Ride> findByDriverOrderByDateDesc(Driver driver);
    
-   Optional<Ride> findByCustomerAndDate(Customer customer,String date);
+   @Query(value = "Select * from rides where customer_id=?1 and date >=?2 and status='PENDING' order by date,pickup_time_first asc",nativeQuery = true)
+   List<Ride> findRidesByDateAndTimeWithCutomer(Long custId,Instant date);
    
-   
-   
-   List<Ride> findByIsCompletedAndPickupTimeFirstBetween(Boolean isCompleted,LocalTime from,LocalTime to);
-   
+   @Query(value="SELECT * FROM rides WHERE pickup_time_first >=?1 and pickup_time_first <=?2 and Date(date)=Date(?3) and customer_id=?4 and status='PENDING'",nativeQuery = true)
+   List<Ride> findRidesByDateAndTime(LocalTime to,LocalTime from,Instant date,Long custId);
 
 }

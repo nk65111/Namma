@@ -1,10 +1,13 @@
 package com.namma.api.entity;
 
+import java.time.Instant;
 import java.time.LocalTime;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -12,6 +15,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+
+import com.namma.api.enumeration.RideStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,7 +39,7 @@ public class Ride {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 	
-	private String date;
+	private Instant date;
 	
 	@Column(name = "pickup_time_first")
     @Basic(optional = false)
@@ -44,9 +49,8 @@ public class Ride {
     @Basic(optional = false)
     private LocalTime pickupTimeSecond;
 	
-	private Boolean isReturn;
-	
-	private Boolean isCompleted;
+	@Enumerated(EnumType.STRING) 
+	private RideStatus status;
 	
 	
 	@OneToOne(mappedBy = "ride")
@@ -60,6 +64,8 @@ public class Ride {
     @JoinColumn(name = "driver_id")
 	private Driver driver;
 	
-	private Long pricePerKilometer;
-	private Long totalPrice;
+	private Double travelDistance;
+	private LocalTime travelTime;
+	
+	private String metadata;
 }

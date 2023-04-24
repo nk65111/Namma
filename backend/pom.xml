@@ -79,6 +79,12 @@
            <groupId>org.springframework.boot</groupId>
            <artifactId>spring-boot-starter-websocket</artifactId>
         </dependency>
+        
+        <dependency>
+	        <groupId>com.google.maps</groupId>
+	        <artifactId>google-maps-services</artifactId>
+	        <version>0.16.1</version>
+       </dependency>
 
 		<!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
 		<dependency>

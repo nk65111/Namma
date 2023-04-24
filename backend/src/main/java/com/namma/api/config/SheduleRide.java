@@ -1,77 +1,152 @@
 package com.namma.api.config;
 
-import java.io.IOException;
+
+import java.time.Instant;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.engine.jdbc.batch.spi.Batch;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.namma.api.entity.Customer;
+import com.google.maps.model.LatLng;
+import com.namma.api.entity.Auth;
 import com.namma.api.entity.Driver;
 import com.namma.api.entity.Ride;
+import com.namma.api.enumeration.RideStatus;
+import com.namma.api.exception.ResourceNotFoundException;
+import com.namma.api.repository.DriverRepository;
 import com.namma.api.repository.RideRepository;
+import com.namma.api.services.GoogleMapsService;
 
 @Component
 public class SheduleRide {
 
-	
-	public static Customer customer=null;
+	public static Auth auth;
 	
 	@Autowired
 	private RideRepository rideRepository;
 	
 	@Autowired
-	private NotificationHandler notificationHandler;
+	private DriverRepository driverRepository;
 	
-	@Scheduled(fixedDelay = 1000)
-	public void sheduleTask() {
+	@Autowired
+	private GoogleMapsService googleMapsService;
+	
+	@Scheduled(fixedDelay = 6000)
+	public void sheduleTask() {	
 		
-        if(customer!=null) {
-        	
-        	  LocalTime now=LocalTime.now();
-	          LocalTime pickUpThreshold=now.plusMinutes(30);
-	          List<Ride> rides=	this.rideRepository.findByIsCompletedAndPickupTimeFirstBetween(false,now,pickUpThreshold);
-		        if(rides!=null&&rides.size()!=0) {
-		          bookRide(rides);
-		        }else {
-		        	System.out.println("No Rides Present..");
-		        }
-
-          
-        }
+		if(auth!=null) {
+			LocalTime to=LocalTime.now();
+	        LocalTime from=to.plusMinutes(30);
+	        Instant dateInstant=Instant.now();
+	        List<Ride> rides=rideRepository.findRidesByDateAndTime(to, from,dateInstant,auth.getId());
+	        if(rides!=null&&rides.size()!=0) {
+	            findSuitableDriver(rides.get(0));
+	        }
+		}
 	}
-	
-	public void bookRide(List<Ride> rides) {
+	public void findSuitableDriver(Ride ride) {
 		
-		//batch rides and assign to drivers according them
-		
-		//this is example
-		Ride ride=rides.get(0);
-		Customer customer=ride.getCustomer();
-		
-		Driver driver=findSuitableDriver(ride);
-		
-		//set ride price todo
-		
-		try {
-			
-			//update json data //todo
-			notificationHandler.notifyDriver(driver.getId()+"", "You have to pickup this customer");
-			
-			notificationHandler.notifyUser(driver.getId()+"", "You have assigned this driver today");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+	    List<Driver> drivers=this.driverRepository.findAll();
+	    Boolean driverGet=true;
+	    Driver assignDriver=null;
+	    try {
+		    	for(Driver driver:drivers) {
+		    		if(googleMapsService.isDriverNearby(driver,ride)&&driver.getIsAvilable()&&driver.getActive()) {
+		    			assignDriver=driver;
+		    			List<Ride> rides=driver.getRides();
+		    			boolean isBatchflag=false;
+		    			if(rides.size()<3&&batchRides(ride, rides.get(0))) {
+		    			    rides.add(ride);
+		    			    if(rides.size()==3) {
+		    			    	driver.setIsAvilable(false);
+		    			    }
+		    			    isBatchflag=true;
+		    			    driverGet=true;
+		    			}
+		    			if(isBatchflag) {
+		    			   break;
+		    			}
+		    		}
+		    	}
+		    	if(driverGet==false&&assignDriver!=null) {
+		    		assignDriver.getRides().add(ride);
+		    		this.driverRepository.save(assignDriver);
+		    		ride.setStatus(RideStatus.SHEDULED);
+		    		ride.setDriver(assignDriver);
+		    		this.rideRepository.save(ride);
+		    	}
+		    	else {
+		    		throw new ResourceNotFoundException("Driver is not available in your location");
+		    	}
+		    	
+	    }catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public Driver findSuitableDriver(Ride ride) {
-		
-		//todo after google api
-		return null;
-	}
+	// Batching threshold in meters for considering rides as intersecting
+    private static final double INTERSECTION_THRESHOLD_METERS = 500;
+
+    // Batching threshold in seconds for considering rides as having matching pickup time
+    private static final long TIME_THRESHOLD_MINUTES = 5;
+    
+    private static final double EARTH_RADIUS_KM=6371.0;
+    
+    
+	
+	
+	 public boolean batchRides(Ride ride1,Ride ride2) {
+            if (isRideIntersecting(ride1, ride2) && isRideMatchingTime(ride1, ride2)) {
+                return true;
+            }
+            return false;
+	    }
+	 
+	    
+	    
+	 // Method to check if two rides are intersecting
+	    private boolean isRideIntersecting(Ride ride1, Ride ride2) {
+	    	LatLng pickLatLng1=new LatLng(ride1.getLocation().getPickUplatitude(),ride1.getLocation().getPickUplongitude());
+	    	LatLng dropLatLng1=new LatLng(ride1.getLocation().getDroplatitude(),ride1.getLocation().getDroplongitude());
+	    	
+	    	LatLng pickLatLng2=new LatLng(ride2.getLocation().getPickUplatitude(),ride2.getLocation().getPickUplongitude());
+	    	LatLng dropLatLng2=new LatLng(ride2.getLocation().getDroplatitude(),ride2.getLocation().getDroplongitude());
+	        double pickupDistance = getDistance(pickLatLng1, pickLatLng2);
+	        double dropDistance = getDistance(dropLatLng1, dropLatLng2);
+
+	        return pickupDistance <= INTERSECTION_THRESHOLD_METERS || dropDistance <= INTERSECTION_THRESHOLD_METERS;
+	    }
+
+	    // Method to check if two rides have matching pickup time
+	    private boolean isRideMatchingTime(Ride ride1, Ride ride2) {
+	    	
+	    	long timeDifferenceMinutes = ChronoUnit.MINUTES.between(ride1.getPickupTimeFirst(), ride2.getPickupTimeFirst());
+	        return timeDifferenceMinutes <= TIME_THRESHOLD_MINUTES;
+	    }
+	    
+	    
+	 // Method to calculate distance between two LatLng points using Haversine formula
+	    private double getDistance(LatLng latLng1, LatLng latLng2) {
+	        double lat1 = Math.toRadians(latLng1.lat);
+	        double lon1 = Math.toRadians(latLng1.lng);
+	        double lat2 = Math.toRadians(latLng2.lat);
+	        double lon2 = Math.toRadians(latLng2.lng);
+
+	        double dLon = lon2 - lon1;
+	        double dLat = lat2 - lat1;
+
+	        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+	                Math.cos(lat1) * Math.cos(lat2) *
+	                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+	        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+	        return EARTH_RADIUS_KM * c * 1000; // Convert to meters
+	    }
+
+	 
+  
 }

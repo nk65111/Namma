@@ -34,6 +34,7 @@ import com.namma.api.dto.DriverLocationDto;
 import com.namma.api.dto.JwtRequest;
 import com.namma.api.dto.JwtResponse;
 import com.namma.api.dto.RideDto;
+import com.namma.api.dto.RideResponse;
 import com.namma.api.entity.Auth;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
@@ -151,10 +152,10 @@ public class DriverController {
 	}
     
     @GetMapping("ride/history-ride")
-    public ResponseEntity<List<RideDto>> getAllCompleteRideByCutomer(@RequestParam("isCompleted") Boolean isCompleted,Principal principal) throws ResourceNotFoundException{
+    public ResponseEntity<List<RideResponse>> getAllRidesByDriver(Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
-    	List<RideDto> rideDtos= this.rideService.getAllCompleteRideByDriver(auth.getId(), isCompleted);
-    	return new ResponseEntity<List<RideDto>>(rideDtos,HttpStatus.OK);
+    	List<RideResponse> rideResponses= this.rideService.getAllRideByDriver(auth.getId());
+    	return new ResponseEntity<List<RideResponse>>(rideResponses,HttpStatus.OK);
     }
     
     @DeleteMapping("/delete-profile")
