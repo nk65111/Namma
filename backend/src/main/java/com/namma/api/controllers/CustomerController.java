@@ -40,6 +40,7 @@ import com.namma.api.services.AbstractUserDetailsService;
 import com.namma.api.services.AbstractUserDetailsServiceImpl;
 import com.namma.api.services.CustomerService;
 import com.namma.api.services.RideService;
+import com.namma.api.services.SMSService;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -63,13 +64,17 @@ public class CustomerController {
     @Autowired 
     private SheduleRide sheduleRide;
     
+    @Autowired
+    private SMSService smsService;
+    
     
     @Autowired
 	private RideService rideService;
 	
 	@PostMapping("/generateOtp")
 	public ResponseEntity<String> generateOtp(@RequestParam("phoneNumber") String phoneNumber) {
-		customerService.generateOtp(phoneNumber);
+		String otp= customerService.generateOtp(phoneNumber);
+		this.smsService.doSMS(phoneNumber,otp);
 		return new ResponseEntity<String>("OTP generated successfully", HttpStatus.OK);
 	}
 	

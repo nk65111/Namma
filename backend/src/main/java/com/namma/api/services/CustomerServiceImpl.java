@@ -34,7 +34,7 @@ public class CustomerServiceImpl implements CustomerService{
 	
 	 
 	@Override
-	public void generateOtp(String phoneNumber) {
+	public String generateOtp(String phoneNumber) {
 		Optional<Customer> existingAuth = customerRepository.findByPhoneNumber(phoneNumber);
 		String token = otpService.generateOtp();
 		System.out.println("OTP"+token);
@@ -49,6 +49,7 @@ public class CustomerServiceImpl implements CustomerService{
 			customer.setOtp(bCryptPasswordEncoder.encode(token));
 			customerRepository.save(customer);
 		}
+		return token;
 		
 	}
 	

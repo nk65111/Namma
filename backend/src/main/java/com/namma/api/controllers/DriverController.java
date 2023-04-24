@@ -42,6 +42,7 @@ import com.namma.api.security.CustomUserDetails;
 import com.namma.api.services.AbstractUserDetailsService;
 import com.namma.api.services.DriverService;
 import com.namma.api.services.RideService;
+import com.namma.api.services.SMSService;
 
 @RestController
 @RequestMapping("/api/v1/driver")
@@ -61,13 +62,17 @@ public class DriverController {
     
     @Autowired
     private RideService rideService;
+    
+    @Autowired
+    private SMSService smsService;
 
     @Autowired
     private JwtUtil jwtUtil;
     
     @PostMapping("/generateOtp")
 	public ResponseEntity<String> generateOtp(@RequestParam("phoneNumber") String phoneNumber) {
-    	driverService.generateOtp(phoneNumber);
+    	String otp= driverService.generateOtp(phoneNumber);
+    	this.smsService.doSMS(phoneNumber, otp);
 		return new ResponseEntity<String>("OTP generated successfully", HttpStatus.OK);
 	}
 	

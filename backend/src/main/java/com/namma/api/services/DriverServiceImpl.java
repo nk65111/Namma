@@ -46,7 +46,7 @@ public class DriverServiceImpl implements DriverService {
 	private DriverLocationRepository driverLocationRepository;
     
     
-    public void generateOtp(String phoneNumber) {
+    public String generateOtp(String phoneNumber) {
 		Optional<Driver> existingAuth = driverRepository.findByPhoneNumber(phoneNumber);
 		String token = otpService.generateOtp();
 		System.out.println("OTP"+token);
@@ -61,7 +61,9 @@ public class DriverServiceImpl implements DriverService {
 			driver.setOtp(bCryptPasswordEncoder.encode(token));
 			driver.setCreatedAt(LocalDateTime.now());
 			driverRepository.save(driver);
-		} 
+		}
+		
+		return token;
 	}
 	
 	public void verifyOtp(String phoneNumber, String otp) throws OtpNotValidException, PhoneNumberNotFoundException {

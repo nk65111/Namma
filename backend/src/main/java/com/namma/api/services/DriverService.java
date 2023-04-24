@@ -11,7 +11,7 @@ import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 
 public interface DriverService {
-	public void generateOtp(String phoneNumber);
+	public String generateOtp(String phoneNumber);
 	public void verifyOtp(String phoneNumber, String otp) throws OtpNotValidException, PhoneNumberNotFoundException;
 	
 	public void registerDriverKyc(DriverKycDto driverKycDto) throws ResourceNotFoundException;

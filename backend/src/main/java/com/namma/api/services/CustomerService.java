@@ -8,7 +8,7 @@ import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 
 public interface CustomerService {
-	public void generateOtp(String phoneNumber);
+	public String generateOtp(String phoneNumber);
 	public void verifyOtp(String phoneNumber, String otp) throws OtpNotValidException, PhoneNumberNotFoundException;
 	public CustomerDto getProfile(Long customerId) throws ResourceNotFoundException;
 	public void updateProfile(CustomerDto customerDto) throws ResourceNotFoundException;
