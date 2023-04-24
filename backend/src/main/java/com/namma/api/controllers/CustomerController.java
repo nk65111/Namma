@@ -1,7 +1,7 @@
 package com.namma.api.controllers;
 
 import java.security.Principal;
-
+import java.util.HashMap;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -31,6 +31,7 @@ import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.JwtRequest;
 import com.namma.api.dto.JwtResponse;
 import com.namma.api.dto.RideDto;
+import com.namma.api.dto.RideResponse;
 import com.namma.api.entity.Auth;
 import com.namma.api.entity.Customer;
 import com.namma.api.exception.ResourceNotFoundException;
@@ -62,6 +63,7 @@ public class CustomerController {
     @Autowired 
     private SheduleRide sheduleRide;
     
+    
     @Autowired
 	private RideService rideService;
 	
@@ -92,7 +94,8 @@ public class CustomerController {
 
         UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
-        
+        CustomUserDetails customUserDetails= (CustomUserDetails)userDetails;
+        this.sheduleRide.auth=customUserDetails.getAuth();
         return  ResponseEntity.ok(new JwtResponse(token));
     }
     
@@ -125,31 +128,27 @@ public class CustomerController {
     
     
     @PutMapping("/ride/update-book")
-    public ResponseEntity<String> updateRide(@RequestBody RideDto rideDto,Principal principal) throws ResourceNotFoundException{
+    public ResponseEntity<String> updateRide(@RequestBody RideResponse rideResponse,Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
-    	rideDto.setUserId(auth.getId());
-    	this.rideService.updateRide(rideDto);;
+    	rideResponse.setUserId(auth.getId());
+    	this.rideService.updateRide(rideResponse);;
     	return new ResponseEntity<String>("Ride update sucessfully",HttpStatus.OK);
     }
     
     @GetMapping("ride/get-completed-ride")
-    public ResponseEntity<List<RideDto>> getAllCompleteRideByCutomer(@RequestParam("isCompleted") Boolean isCompleted,Principal principal) throws ResourceNotFoundException{
+    public ResponseEntity<HashMap<String,Object>> getAllCompleteRideByCutomer(Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
-    	List<RideDto> rideDtos= this.rideService.getAllCompleteRideByUser(auth.getId(), isCompleted);
-    	return new ResponseEntity<List<RideDto>>(rideDtos,HttpStatus.OK);
+    	HashMap<String, Object> rideResponses= this.rideService.getAllRideByUser(auth.getId());
+    	return new ResponseEntity<>(rideResponses,HttpStatus.OK);
     }
     
-    @PostMapping("/ride/start-searching-ride")
-    public void StartSearchingRide(Principal principal) {
-    	Auth auth=getAuthByJwt(principal);
-        this.sheduleRide.customer=(Customer)auth;
-    }
+   
     
-    @DeleteMapping("/ride/delete-book/{date}")
-    public ResponseEntity<String> deleteRide(@PathVariable("date") String date,Principal principal) throws ResourceNotFoundException{
+    @DeleteMapping("/ride/delete-book/{rideId}")
+    public ResponseEntity<String> deleteRide(@PathVariable("rideId") Long rideId,Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
     	
-    	this.rideService.deleteRide(date,auth.getId());
+    	this.rideService.deleteRide(rideId,auth.getId());
     	return new ResponseEntity<String>("Ride delete successfully",HttpStatus.OK); 
     }
 	

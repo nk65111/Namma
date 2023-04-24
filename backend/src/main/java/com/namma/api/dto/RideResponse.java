@@ -1,11 +1,7 @@
 package com.namma.api.dto;
 
-
-
-
 import java.time.Instant;
 import java.time.LocalTime;
-import java.util.List;
 
 import com.namma.api.enumeration.RideStatus;
 
@@ -20,15 +16,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RideDto {
+public class RideResponse {
 	private Long id;
 	private Long userId;
 	private Double pickUpLatitiude;
 	private Double pickUpLongitute;
 	private Double dropLatitude;
 	private Double dropLongitute;
-	private List<Instant> date;
+	private Instant date;
 	private LocalTime pickUpTime;
 	private RideStatus status;
+	private Double travelDistance;
+	private LocalTime travelTime;
 	private String metadata;
 }
