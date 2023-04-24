@@ -12,13 +12,13 @@ import LiscencePic from './screens/AuthScreens/LiscencePic'
 
 import RNLocation from 'react-native-location';
 import { useDispatch } from 'react-redux'
-import { setCurrentLocation, setRides } from './slices/travelSlice'
+import { setCurrentLocation } from './slices/travelSlice'
 import { refetchLocation } from './utils/constant'
 import NavigatorTab from './NavigatorTab'
-import OneDayRides from './screens/Rides/OneDayRides'
-import ScheduleRide from './screens/Rides/ScheduleRide'
-import { ridesData } from './utils/routeData'
-import { getLocation } from './hooks'
+import { Data } from './utils/routeData'
+import { getLocation, useValidateToken } from './hooks'
+import { getToken } from './services/service'
+import { setToken } from './slices/userSlice'
 
 RNLocation.configure({
   distanceFilter: 1
@@ -29,15 +29,25 @@ function Routes() {
 
   const navigationRef = React.useRef()
   useReduxDevToolsExtension(navigationRef)
-  const [jumpScreen, setJumpScreen] = React.useState('HomeScreen')
-  const [loading, setLoading] = useState(false)
+  const [jumpScreen, setJumpScreen] = React.useState('IntroScreen')
+  const [loading, setLoading] = useState(true);
+  const [animationLoading, setAnimationLoading] = useState(true);
+
   const [userLocation, setUserLocation] = useState(null)
 
-  useEffect(() => {
-    dispatch(setRides(ridesData))
-  }, [])
 
+  const { isLoading, mutate } = useValidateToken((data) => {
+    if (data?.user) {
+      setJumpScreen(Data[data?.user?.onboardCount]);
+      setLoading(false)
+    }
+  })
 
+  const verifyToken = async () => {
+    let token = await getToken();
+    dispatch(setToken(token))
+    mutate(token)
+  }
 
   const permissionHandle = async () => {
     let location = ''
@@ -76,7 +86,7 @@ function Routes() {
     }
   }
 
-  useEffect(() => { permissionHandle() }, [])
+  useEffect(() => { permissionHandle(); verifyToken() }, [])
 
   useEffect(() => {
     if (typeof (userLocation) !== 'object') {
@@ -111,25 +121,23 @@ function Routes() {
           <AuthStackNavigator.Screen name="ProfilePic" component={ProfilePic} />
           <AuthStackNavigator.Screen name="LiscencePic" component={LiscencePic} />
           <AuthStackNavigator.Screen name="HomeScreen" component={NavigatorTab} />
-          <AuthStackNavigator.Group screenOptions={{
+          {/* <AuthStackNavigator.Group screenOptions={{
             presentation: 'modal',
             animation: 'slide_from_right'
           }}>
-            <AuthStackNavigator.Screen name="Schedule" component={ScheduleRide} />
-            <AuthStackNavigator.Screen name="OneDayRides" component={OneDayRides} />
-          </AuthStackNavigator.Group>
+          </AuthStackNavigator.Group> */}
         </>
       </AuthStackNavigator.Navigator>
     )
   }
 
 
-  return !loading ? (
+  return !loading && !isLoading && !animationLoading ? (
     <NavigationContainer>
       <AuthStack routename={jumpScreen} />
     </NavigationContainer>
   ) : (
-    <Splash />
+    <Splash setLoading={setAnimationLoading} />
   )
 }
 
