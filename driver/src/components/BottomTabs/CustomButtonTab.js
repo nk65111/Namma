@@ -40,9 +40,9 @@ export const CustomBottomTab = ({
         switch (routeName) {
             case 'Home':
                 return 'home';
-            case 'Add Ride':
+            case 'Route2':
                 return 'calendar';
-            case 'Rides':
+            case 'Route3':
                 return 'clockcircleo';
             case 'Profile':
                 return 'appstore1';
