@@ -1,5 +1,6 @@
 package com.namma.api.services;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,11 +14,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.namma.api.dto.CustomerDto;
+import com.namma.api.dto.WalletDto;
 import com.namma.api.entity.Customer;
+import com.namma.api.entity.Wallet;
+import com.namma.api.enumeration.WalletOwner;
 import com.namma.api.exception.OtpNotValidException;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.repository.CustomerRepository;
+import com.namma.api.repository.WalletRepository;
 
 @Service
 @Transactional
@@ -31,6 +36,9 @@ public class CustomerServiceImpl implements CustomerService{
 	
 	@Autowired
 	private BCryptPasswordEncoder  bCryptPasswordEncoder;
+	
+	@Autowired
+	private WalletRepository walletRepository;
 	
 	 
 	@Override
@@ -68,6 +76,12 @@ public class CustomerServiceImpl implements CustomerService{
         if (!otpService.isOtpValid(phoneNumber, otp)) {
             throw new OtpNotValidException("Invalid OTP for phone number: " + phoneNumber);
         }
+        
+        Wallet wallet = new Wallet();
+        wallet.setCustomer(auth);
+        wallet.setWalletOwner(WalletOwner.CUSTOMER);
+        wallet.setBalance(new BigDecimal(500));
+        walletRepository.save(wallet);
 
         // Clear OTP and update driver record
         auth.setOtp(null);

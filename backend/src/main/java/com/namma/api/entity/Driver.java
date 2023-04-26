@@ -65,5 +65,9 @@ public class Driver extends Auth {
     
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     private List<Ride> rides = new ArrayList<>();
-
+    
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "wallet_id", referencedColumnName = "id")
+    private Wallet wallet;
+ 
 }

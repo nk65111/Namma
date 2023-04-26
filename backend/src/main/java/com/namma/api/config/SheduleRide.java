@@ -12,6 +12,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.google.maps.model.LatLng;
+import com.namma.api.dto.NotificationDto;
 import com.namma.api.entity.Auth;
 import com.namma.api.entity.Driver;
 import com.namma.api.entity.Ride;
@@ -20,11 +21,15 @@ import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.repository.DriverRepository;
 import com.namma.api.repository.RideRepository;
 import com.namma.api.services.GoogleMapsService;
+import com.namma.api.services.NotificationService;
 
 @Component
 public class SheduleRide {
 
 	public static Auth auth;
+	
+	@Autowired
+	private NotificationService notificationService;
 	
 	@Autowired
 	private RideRepository rideRepository;
@@ -64,8 +69,24 @@ public class SheduleRide {
 		    			    if(rides.size()==3) {
 		    			    	driver.setIsAvilable(false);
 		    			    }
+		    			    
 		    			    isBatchflag=true;
 		    			    driverGet=true;
+		    			    
+		    			    NotificationDto notificationDto = new NotificationDto();
+				    		notificationDto.setTitle("New Booking");
+				    		notificationDto.setMessage("you have assign a passanger");
+				    		notificationDto.setToken(ride.getDriver().getDeviceToken());
+				    		notificationDto.setRideId(ride.getId());
+				    		this.notificationService.sendNotification(notificationDto);
+				    		
+				    		NotificationDto notificationDtoForUser = new NotificationDto();
+				    		notificationDtoForUser.setTitle("Accept Booking");
+				    		notificationDtoForUser.setMessage("you have assign a driver");
+				    		notificationDtoForUser.setToken(ride.getCustomer().getDeviceToken());
+				    		notificationDtoForUser.setRideId(ride.getId());
+				    		this.notificationService.sendNotification(notificationDtoForUser);
+		    			    
 		    			}
 		    			if(isBatchflag) {
 		    			   break;
@@ -77,6 +98,21 @@ public class SheduleRide {
 		    		this.driverRepository.save(assignDriver);
 		    		ride.setStatus(RideStatus.SHEDULED);
 		    		ride.setDriver(assignDriver);
+		    		
+		    		NotificationDto notificationDto = new NotificationDto();
+		    		notificationDto.setTitle("New Booking");
+		    		notificationDto.setMessage("you have assign a passanger");
+		    		notificationDto.setToken(ride.getDriver().getDeviceToken());
+		    		notificationDto.setRideId(ride.getId());
+		    		this.notificationService.sendNotification(notificationDto);
+		    		
+		    		NotificationDto notificationDtoForUser = new NotificationDto();
+		    		notificationDtoForUser.setTitle("Accept Booking");
+		    		notificationDtoForUser.setMessage("you have assign a driver");
+		    		notificationDtoForUser.setToken(ride.getCustomer().getDeviceToken());
+		    		notificationDtoForUser.setRideId(ride.getId());
+		    		this.notificationService.sendNotification(notificationDtoForUser);
+		    		
 		    		this.rideRepository.save(ride);
 		    	}
 		    	else {

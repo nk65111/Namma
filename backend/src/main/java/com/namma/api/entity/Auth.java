@@ -1,17 +1,15 @@
 package com.namma.api.entity;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
 
+import javax.persistence.CascadeType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +26,11 @@ import lombok.Setter;
 @Builder
 @MappedSuperclass
 public class Auth implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Id
 	@EqualsAndHashCode.Include
@@ -39,4 +42,6 @@ public class Auth implements Serializable{
 	private String name; 
 	
 	private String otp;
+	
+	private String deviceToken;
 }
