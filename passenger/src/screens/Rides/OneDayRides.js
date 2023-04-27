@@ -9,8 +9,32 @@ import Animated, { FadeInUp } from 'react-native-reanimated'
 import BlueButton from '../../components/BlueButton'
 import PrimaryButton from '../../components/PrimaryButton'
 import BackButton from '../../components/BackButton'
+import { useCancelRide } from '../../hooks'
+import { getRides, getToken } from '../../services/service'
+import { useNavigation } from '@react-navigation/native'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectRide, setRide, setRides } from '../../slices/travelSlice'
+import { useQuery } from 'react-query'
+import { selectToken } from '../../slices/userSlice'
 
-function OneDayRides({ route, navigation }) {
+function OneDayRides() {
+  const dispatch = useDispatch()
+  const navigator = useNavigation()
+  const ride = useSelector(selectRide)
+  const token = useSelector(selectToken);
+
+  const removeRide = (id) => {
+    let arr = [...ride?.rideList]
+    let idx = arr.findIndex(item => item.id == id);
+    if (idx > -1) {
+      arr.splice(idx, 1);
+      console.log('ride removed');
+      dispatch(setRide({
+        date: ride?.date,
+        rideList: arr
+      }))
+    }
+  }
 
   return (
     <Animated.View style={tw`flex-1`}>
@@ -26,13 +50,13 @@ function OneDayRides({ route, navigation }) {
         </TouchableOpacity>
       </View>
       <View style={tw`bg-white py-2 px-5 shadow-lg rounded-xl mx-auto my-4`}>
-        <Text style={tw`text-2xl text-center font-medium`}>{moment(route.params.date).format("DD MMM YYYY")}</Text>
+        <Text style={tw`text-2xl text-center font-medium`}>{moment(ride?.date).format("DD MMM YYYY")}</Text>
       </View>
 
       <ScrollView horizontal={false} style={tw`flex-1 w-full p-5`} showsVerticalScrollIndicator={false}>
         {
-          route.params?.rideList?.length ?
-            route.params?.rideList?.map((ride, i) => <RideInfo key={i} navigator={navigation} ride={ride} />)
+          ride?.rideList?.length ?
+            ride?.rideList?.map((ride, i) => <RideInfo removeRide={removeRide} dispatch={dispatch} token={token} key={i} navigator={navigator} ride={ride} />)
             :
             <Text style={tw`text-3xl font-medium text-gray-400 text-center`}>No Ride Scheduled</Text>
         }
@@ -43,21 +67,35 @@ function OneDayRides({ route, navigation }) {
 
 export default OneDayRides
 
-const RideInfo = ({ ride, navigator }) => {
+const RideInfo = ({ removeRide, dispatch, ride, navigator, token }) => {
   const [open, setOpen] = useState(false);
 
   const handleEdit = () => {
     navigator.navigate("Schedule", { ride: ride })
   }
 
-  const handleCancel = () => {
+  const { refetch: fetchRides } = useQuery('userRides', () => getRides(token), {
+    enabled: false,
+    staleTime: 300000,
+    onSuccess: (res) => {
+      removeRide(ride.id);
+      if (res.data?.rides) {
+        dispatch(setRides(res.data || {}));
+      }
+    }
+  })
+
+  const { isLoading: canceling, mutate: cancelRide } = useCancelRide(() => fetchRides())
+
+  const handleCancel = async () => {
+    let token = await getToken();
     Alert.alert("Cancel Ride", 'Are you sure, you want to cancel ride?', [
       {
         text: 'No',
         onPress: () => console.log('Cancel Pressed'),
         style: 'cancel',
       },
-      { text: 'Yes', onPress: () => console.log('OK Pressed') },
+      { text: 'Yes', onPress: () => cancelRide({ token, rideId: ride.id }) },
     ])
   }
 
@@ -71,8 +109,8 @@ const RideInfo = ({ ride, navigator }) => {
             <View style={tw`w-2 h-2 rounded-full bg-gray-800`}></View>
           </View>
           <View style={tw`flex-grow px-2`}>
-            <Text style={tw`text-lg`}>{ride.pickUpLocation?.name?.length > 25 ? `${ride.pickUpLocation?.name?.slice(0, 25)}...` : ride.pickUpLocation?.name}</Text>
-            <Text style={tw`text-lg`}>{ride.dropLocation?.name?.length > 25 ? `${ride.dropLocation?.name?.slice(0, 25)}...` : ride.dropLocation?.name}</Text>
+            <Text numberOfLines={1} style={tw`text-lg`}>{ride.pickUpLocation?.name}</Text>
+            <Text numberOfLines={1} style={tw`text-lg`}>{ride.dropLocation?.name}</Text>
           </View>
           <View>
             {
@@ -89,16 +127,16 @@ const RideInfo = ({ ride, navigator }) => {
             <Text style={tw`text-lg`}>{`${moment(ride?.pickUpTime)?.format('LT')} - ${moment(ride?.pickUpTime).add(30, 'minute')?.format('LT')}`}</Text>
           </View>
           <View style={tw`flex-row items-center my-2`}>
-            <Text style={tw`text-lg font-medium`}>Travel Distance:  </Text>
-            <Text style={tw`text-lg`}></Text>
+            <Text style={tw`text-lg font-medium`}>Travel Distance: </Text>
+            <Text style={tw`text-lg`}>{ride?.travelDistance}</Text>
           </View>
           <View style={tw`flex-row items-center my-2`}>
-            <Text style={tw`text-lg font-medium`}>Travel Time:  </Text>
-            <Text style={tw`text-lg`}></Text>
+            <Text style={tw`text-lg font-medium`}>Travel Time: </Text>
+            <Text style={tw`text-lg`}>{ride?.travelTime}</Text>
           </View>
           <View style={tw`flex-row items-center justify-between my-4`}>
-            <BlueButton text={'Edit Ride'} onPress={handleEdit} disabled={moment(ride?.pickUpDate).diff(moment(), 'hours') < 24} />
-            <PrimaryButton text={"Cancel"} onPress={handleCancel} disabled={moment(ride?.pickUpDate).diff(moment(), 'hours') < 2} />
+            <BlueButton text={'Edit Ride'} onPress={handleEdit} disabled={moment(ride?.pickUpDate).diff(moment(), 'hours') < 24 || canceling} />
+            <PrimaryButton text={"Cancel"} onPress={handleCancel} disabled={moment(ride?.pickUpDate).diff(moment(), 'hours') < 2 || canceling} />
           </View>
         </View>
       </Animated.View>

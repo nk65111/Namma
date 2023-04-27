@@ -23,7 +23,7 @@ function Home() {
   const currentLoc = useSelector(selectCurrentLocation)
   const travelInfo = useSelector(selectTravelTimeInfo);
   const userInfo = useSelector(selectUserDetails)
-console.log("user info",userInfo)
+
   return (
     <Animated.View entering={FadeIn.duration(500)} style={tw`flex-1`}>
       <Animated.View entering={SlideInUp.duration(500)} style={[tw`p-4 pt-6 relative z-10 flex-row items-start justify-between w-full bg-white h-52`, { borderBottomRightRadius: 55 }]}>

@@ -9,10 +9,13 @@ import tw from 'twrnc'
 import { colors } from '../../utils/constant'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { CommonActions, useNavigation } from '@react-navigation/native'
+import { useSelector } from 'react-redux'
+import { selectUserDetails } from '../../slices/userSlice'
 
 function MyProfile() {
 
-  const navigator = useNavigation()
+  const navigator = useNavigation();
+  const userInfo = useSelector(selectUserDetails)
 
   const logout = async () => {
     const keys = ["raahi_token"]
@@ -36,7 +39,7 @@ function MyProfile() {
         <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="2xl" source={{
           uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
         }} />
-        <Text style={tw`text-xl text-center py-1 text-gray-600`}>Topi Master</Text>
+        <Text style={tw`text-xl text-center py-1 text-gray-600`}>{userInfo?.name}</Text>
       </View>
 
 
