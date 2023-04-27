@@ -1,5 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { BASE_URL, endpoints } from "./config";
+import { BASE_URL, endpoints } from "../common/config";
 
 import axios from "axios"
 

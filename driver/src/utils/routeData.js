@@ -1,8 +1,8 @@
 export const Data = {
-  1: 'AboutYou',
-  2: 'ProfilePic',
-  3: 'LiscencePic',
-  4: 'Home'
+  1: 'LIENCE_PIC',
+  2: 'BANK_DETAIL',
+  3: 'VEHICLE_DETAIL',
+  4: 'PROFILE_PIC'
 }
 
 export const ridesData = [

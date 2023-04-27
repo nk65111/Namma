@@ -1,9 +1,9 @@
 import { applyMiddleware } from "redux";
 import logger from "redux-logger";
 import { composeWithDevTools } from "redux-devtools-extension";
-import counterReducer from '../slices/counterSlice'
-import travelReducer from '../slices/travelSlice'
-import userReducer from '../slices/userSlice'
+import counterReducer from './counterSlice'
+import travelReducer from './travelSlice'
+import userReducer from './userSlice'
 import { configureStore } from "@reduxjs/toolkit";
 
 const analytics = () => (next) => (action) => {
@@ -12,20 +12,16 @@ const analytics = () => (next) => (action) => {
     event: action.type,
     payload: action.payload,
   });
-
   return next(action);
 };
 
 // Redux store config
 const createStore = () => {
-
-  // Middleware and store enhancers
   const middlewares = [
     process.env.NODE_ENV !== "production" && logger,
     analytics,
   ].filter(Boolean);
-  // const enhancer = compose(applyMiddleware(...middlewares));
-  // const composeEnhancers = composeWithDevTools({});
+
   const store = configureStore(
     {
       reducer: {
@@ -36,7 +32,6 @@ const createStore = () => {
     },
     composeWithDevTools(applyMiddleware(...middlewares))
   );
-
   return store;
 };
 

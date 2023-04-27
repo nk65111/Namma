@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
-import { Image, Text, TouchableOpacity, View } from 'react-native'
+import { Image, Text, TouchableOpacity, View, Alert } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
@@ -8,46 +8,45 @@ import BackButton from '../../components/BackButton'
 import PrimaryButton from '../../components/PrimaryButton'
 import SecondaryButton from '../../components/SecondaryButton'
 import { PickImage, colors } from '../../utils/constant'
-import Icon from 'react-native-vector-icons/EvilIcons'
-import { useUpdateProfile } from '../../hooks'
-import { useSelector } from 'react-redux'
-import { selectToken } from '../../slices/userSlice'
+import Icon from 'react-native-vector-icons/EvilIcons';
+
+import { DriverKycService } from '../../services';
 
 function ProfilePic() {
-    const navigation = useNavigation()
-    const [imageUrl, setImageUrl] = useState('');
-    const token = useSelector(selectToken)
-
-    const { isLoading, mutate: updateProfile } = useUpdateProfile(() => navigation.navigate('LiscencePic'));
-
-    const handleImageUpload = async (image) => {
-        updateProfile(token, { profilePic: image })
-    }
+    const navigation = useNavigation();
+    const [isLoading, setIsLoading] = useState(false);
+    const [image, setImage] = useState('');
 
     const handleImage = async () => {
         let Handler = await PickImage()
-        console.log('handleImage -> Handler', Handler)
         if (Handler?.success) {
-            setImageUrl(Handler?.response)
-        } else {
-            // console.log(Handler.response)
+            setImage(Handler?.response)
         }
     }
-    const handleNext = async () => {
 
-        if (!imageUrl) {
+    const handleNext = async () => {
+        if (!image) {
             Alert.alert('Please Upload Image')
         } else {
             Alert.alert(
                 '',
                 "Kindly ensure it's your actual picture preferably a formal one, for better curation.",
 
-                [{ text: 'Next', onPress: () => handleImageUpload(imageUrl) }, { text: 'Cancel' }],
+                [{ text: 'Next', onPress: () => uploadSelfie(image) }, { text: 'Cancel' }],
                 {
                     cancelable: true,
                 }
             )
         }
+    }
+
+    const uploadSelfie = (image) => {
+        setIsLoading(true);
+        DriverKycService.addKyc(image)
+            .then(() => {
+                navigator.navigate('HomeScreen', { profilePic: image });
+            })
+            .finally(() => setIsLoading(false))
     }
 
     return (
@@ -66,8 +65,8 @@ function ProfilePic() {
                     <TouchableOpacity onPress={() => handleImage()} style={tw`w-48 h-48 rounded-lg bg-gray-100 mx-auto my-6 flex-row items-center justify-center`}>
                         <>
                             {
-                                Boolean(imageUrl) ?
-                                    <Image source={{ uri: imageUrl }} resizeMode="cover" style={tw`h-full w-full rounded-lg`} />
+                                Boolean(image) ?
+                                    <Image source={{ uri: image }} resizeMode="cover" style={tw`h-full w-full rounded-lg`} />
                                     :
                                     <Icon name='image' size={100} style={tw`text-gray-600`} />
                             }
@@ -75,7 +74,7 @@ function ProfilePic() {
                     </TouchableOpacity>
                     <View style={tw`flex-row items-center justify-between w-full pt-6`}>
                         <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} extra='my-6' />
-                        <PrimaryButton text={"Continue"} disabled={isLoading} onPress={handleNext} extra='my-6' />
+                        <PrimaryButton text={"Submit"} disabled={isLoading} onPress={handleNext} extra='my-6' />
                     </View>
                 </View>
 

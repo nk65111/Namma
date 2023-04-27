@@ -9,45 +9,45 @@ import PrimaryButton from '../../components/PrimaryButton'
 import SecondaryButton from '../../components/SecondaryButton'
 import { PickImage, colors } from '../../utils/constant'
 import Icon from 'react-native-vector-icons/EvilIcons'
-import { useUpdateProfile } from '../../hooks'
-import { useSelector } from 'react-redux'
-import { selectToken } from '../../slices/userSlice'
+import { DriverKycService } from '../../services';
 
-function ProfilePic({ navigation }) {
-    const token = useSelector(selectToken)
-    const navigator = useNavigation()
-    const [imageUrl, setImageUrl] = useState('');
-
-    const { isLoading, mutate: updateProfile } = useUpdateProfile(() => navigation.push('HomeScreen'));
-
-    const handleImageUpload = async (image) => {
-        updateProfile(token, { liscencePic: image })
-    }
+const ProfilePic = ({ navigation }) => {
+    const navigator = useNavigation();
+    const [isLoading, setIsLoading] = useState(false);
+    const [image, setImage] = useState('');
 
     const handleImage = async (Location) => {
         let Handler = await PickImage(Location)
-        console.log('handleImage -> Handler', Handler)
         if (Handler?.success) {
-            setImageUrl(Handler?.response)
+            setImage(Handler?.response)
         } else {
-            // console.log(Handler.response)
+
         }
     }
+
     const handleNext = async () => {
-        handleImageUpload();
-        if (!imageUrl) {
+        uploadLicence();
+        if (!image) {
             Alert.alert('Please Upload Image')
         } else {
             Alert.alert(
                 '',
                 "Kindly ensure it's your actual picture preferably a formal one, for better curation.",
-
-                [{ text: 'Next', onPress: () => handleImageUpload(imageUrl) }, { text: 'Cancel' }],
+                [{ text: 'Next', onPress: () => uploadLicence(image) }, { text: 'Cancel' }],
                 {
                     cancelable: true,
                 }
             )
         }
+    }
+
+    const uploadLicence = (image) => {
+        setIsLoading(true);
+        DriverKycService.addKyc(image)
+            .then(() => {
+                navigator.navigate('BANK_DETAIL', { image: image });
+            })
+            .finally(() => setIsLoading(false))
     }
 
     return (
@@ -66,8 +66,8 @@ function ProfilePic({ navigation }) {
                     <TouchableOpacity onPress={() => handleImage('Liscence')} style={tw`w-80 h-48 rounded-lg bg-gray-100 mx-auto my-6 flex-row items-center justify-center`}>
                         <>
                             {
-                                Boolean(imageUrl) ?
-                                    <Image source={{ uri: imageUrl }} resizeMode="cover" style={tw`h-full w-full rounded-lg`} />
+                                Boolean(image) ?
+                                    <Image source={{ uri: image }} resizeMode="cover" style={tw`h-full w-full rounded-lg`} />
                                     :
                                     <Icon name='image' size={100} style={tw`text-gray-600`} />
                             }
