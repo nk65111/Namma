@@ -1,6 +1,8 @@
 package com.namma.api.controllers;
 
 import java.security.Principal;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,7 +30,9 @@ import com.namma.api.dto.RideDto;
 import com.namma.api.dto.RideResponse;
 import com.namma.api.entity.Auth;
 import com.namma.api.entity.Customer;
+import com.namma.api.entity.Ride;
 import com.namma.api.exception.ResourceNotFoundException;
+import com.namma.api.repository.RideRepository;
 import com.namma.api.security.CustomUserDetails;
 import com.namma.api.services.AbstractUserDetailsService;
 import com.namma.api.services.AbstractUserDetailsServiceImpl;
@@ -59,6 +63,9 @@ public class CustomerController {
     
     @Autowired 
     private SheduleRide sheduleRide;
+    
+    @Autowired
+    private RideRepository rideRepository;
     
     @Autowired
     private SMSService smsService;
@@ -180,9 +187,23 @@ public class CustomerController {
         }
     }
     
+    
     public  Auth getAuthByJwt(Principal principal) {
     	CustomUserDetails userDetails= (CustomUserDetails)this.userDetailsServiceImpl.loadUserByUsername(principal.getName());
     	return userDetails.getAuth();
+    }
+    
+    @GetMapping("/get-current-riding")
+    public void getCurrentRiding(Principal principal) {
+        Auth auth=getAuthByJwt(principal);
+    	
+		LocalTime to=LocalTime.now();
+        LocalTime from=to.plusMinutes(30);
+        Instant dateInstant=Instant.now();
+        System.out.println(to+" "+from+" "+dateInstant);
+        List<Ride> rides=rideRepository.findRidesByDateAndTime(to, from,dateInstant,auth.getId());
+        List<Ride> rides2=rideRepository.findAll();
+        System.out.println(rides.size()+" "+rides2.size());
     }
     
    

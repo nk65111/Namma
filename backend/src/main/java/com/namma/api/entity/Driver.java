@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -65,7 +66,7 @@ public class Driver extends Auth {
     
     private Boolean isAvilable=true;
     
-    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "driver", fetch = FetchType.EAGER)
     private List<Ride> rides = new ArrayList<>();
     
     @OneToOne(cascade = CascadeType.ALL)

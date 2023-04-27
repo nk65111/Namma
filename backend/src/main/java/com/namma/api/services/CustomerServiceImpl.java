@@ -122,6 +122,7 @@ public class CustomerServiceImpl implements CustomerService{
         customer.setName(customerDto.getName());
         customer.setGender(customerDto.getGender());
         customer.setUpdatedAt(LocalDateTime.now());
+        customer.setDeviceToken(customerDto.getDeviceToken());
         
        Customer savedCustomer=customerRepository.save(customer);
        CustomerDto saveCustomerDto = new CustomerDto();
@@ -131,6 +132,7 @@ public class CustomerServiceImpl implements CustomerService{
        saveCustomerDto.setPhoneNumber(savedCustomer.getPhoneNumber());
        saveCustomerDto.setWalletId(savedCustomer.getWallet().getId());
        saveCustomerDto.setProfileImage(savedCustomer.getProfileImage());
+       saveCustomerDto.setDeviceToken(savedCustomer.getDeviceToken());
        return saveCustomerDto;
        
 	}
@@ -158,7 +160,7 @@ public class CustomerServiceImpl implements CustomerService{
 			customerDto.setPhoneNumber(customer.getPhoneNumber());
 			customerDto.setWalletId(customer.getWallet().getId());
 			customerDto.setProfileImage(customer.getProfileImage());
-			
+			customerDto.setDeviceToken(customer.getDeviceToken());
 			customerDtos.add(customerDto);
 		});
 		

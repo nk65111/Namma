@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.maps.model.LatLng;
 import com.namma.api.dto.NotificationDto;
@@ -54,6 +55,7 @@ public class SheduleRide {
 			LocalTime to=LocalTime.now();
 	        LocalTime from=to.plusMinutes(30);
 	        Instant dateInstant=Instant.now();
+	        System.out.println(to+" "+from+" "+dateInstant);
 	        List<Ride> rides=rideRepository.findRidesByDateAndTime(to, from,dateInstant,auth.getId());
 	        System.out.println(rides.size());
 	        if(rides!=null&&rides.size()!=0) {
@@ -61,10 +63,12 @@ public class SheduleRide {
 	        }
 		}
 	}
+	
+	@Transactional(readOnly = true)
 	public void findSuitableDriver(Ride ride) {
 		
 	    List<Driver> drivers=this.driverRepository.findAll();
-	    Boolean driverGet=true;
+	    Boolean driverGet=false;
 	    Driver assignDriver=null;
 	    try {
 		    	for(Driver driver:drivers) {
@@ -72,15 +76,20 @@ public class SheduleRide {
 		    			assignDriver=driver;
 		    			List<Ride> rides=driver.getRides();
 		    			boolean isBatchflag=false;
-		    			if(rides.size()<3&&batchRides(ride, rides.get(0))) {
+		    			if(rides.size()>0&&rides.size()<3&&batchRides(ride, rides.get(0))) {
 		    			    rides.add(ride);
 		    			    if(rides.size()==3) {
 		    			    	driver.setIsAvilable(false);
 		    			    }
-		    			    
 		    			    isBatchflag=true;
 		    			    driverGet=true;
 		    			    
+		    			    driver.getRides().add(ride);
+				    		this.driverRepository.save(driver);
+				    		ride.setStatus(RideStatus.SHEDULED);
+				    		ride.setDriver(assignDriver);
+				    		this.rideRepository.save(ride);
+				    		
 		    			    NotificationDto notificationDto = new NotificationDto();
 				    		notificationDto.setTitle("New Booking");
 				    		notificationDto.setMessage("you have assign a passanger");
@@ -106,6 +115,7 @@ public class SheduleRide {
 		    		this.driverRepository.save(assignDriver);
 		    		ride.setStatus(RideStatus.SHEDULED);
 		    		ride.setDriver(assignDriver);
+		    		this.rideRepository.save(ride);
 		    		
 		    		NotificationDto notificationDto = new NotificationDto();
 		    		notificationDto.setTitle("New Booking");
@@ -121,9 +131,8 @@ public class SheduleRide {
 		    		notificationDtoForUser.setRideId(ride.getId());
 		    		this.notificationService.sendNotification(notificationDtoForUser);
 		    		
-		    		this.rideRepository.save(ride);
 		    	}
-		    	else {
+		    	else if(assignDriver==null) {
 		    		throw new ResourceNotFoundException("Driver is not available in your location");
 		    	}
 		    	
