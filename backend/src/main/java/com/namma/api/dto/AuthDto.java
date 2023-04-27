@@ -25,4 +25,6 @@ public class AuthDto {
 	
 	private String name;
 	private String otp;
+	
+	private String deviceToken;
 }

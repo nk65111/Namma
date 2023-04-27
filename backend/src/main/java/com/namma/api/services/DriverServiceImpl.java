@@ -1,5 +1,6 @@
 package com.namma.api.services;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -16,12 +17,15 @@ import com.namma.api.entity.Customer;
 import com.namma.api.entity.Driver;
 import com.namma.api.entity.DriverKyc;
 import com.namma.api.entity.DriverLocation;
+import com.namma.api.entity.Wallet;
+import com.namma.api.enumeration.WalletOwner;
 import com.namma.api.exception.OtpNotValidException;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.repository.DriverKycRepository;
 import com.namma.api.repository.DriverLocationRepository;
 import com.namma.api.repository.DriverRepository;
+import com.namma.api.repository.WalletRepository;
 import com.namma.api.utility.UploadFileUtility;
 
 @Service
@@ -44,6 +48,9 @@ public class DriverServiceImpl implements DriverService {
 	
 	@Autowired
 	private DriverLocationRepository driverLocationRepository;
+	
+	@Autowired
+	private WalletRepository walletRepository;
     
     
     public String generateOtp(String phoneNumber) {
@@ -80,6 +87,12 @@ public class DriverServiceImpl implements DriverService {
         if (!otpService.isOtpValid(phoneNumber, otp)) {
             throw new OtpNotValidException("Invalid OTP for phone number: " + phoneNumber);
         }
+        
+        Wallet wallet = new Wallet();
+        wallet.setDriver(driver);
+        wallet.setWalletOwner(WalletOwner.DRIVER);
+        wallet.setBalance(new BigDecimal(500));
+        walletRepository.save(wallet);
 
         // Clear OTP and update driver record
         driver.setOtp(null);
