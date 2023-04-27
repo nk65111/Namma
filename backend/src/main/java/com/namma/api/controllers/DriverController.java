@@ -71,6 +71,7 @@ public class DriverController {
     
     @PostMapping("/generateOtp")
 	public ResponseEntity<String> generateOtp(@RequestParam("phoneNumber") String phoneNumber) {
+    	System.out.print("phoneNumber: " +phoneNumber);
     	String otp= driverService.generateOtp(phoneNumber);
     	this.smsService.doSMS(phoneNumber, otp);
 		return new ResponseEntity<String>("OTP generated successfully", HttpStatus.OK);
@@ -79,6 +80,7 @@ public class DriverController {
     @PostMapping("/verifyOtp")
     public ResponseEntity<?> genrateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
         try {
+        	System.out.println(jwtRequest.getPhoneNumber()+" "+jwtRequest.getOtp());
            authentication(jwtRequest.getPhoneNumber(),jwtRequest.getOtp());
         }catch (UsernameNotFoundException e){
             e.printStackTrace();
