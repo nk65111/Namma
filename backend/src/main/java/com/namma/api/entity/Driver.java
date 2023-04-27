@@ -14,10 +14,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.namma.api.enumeration.KycStatus;
 import com.namma.api.enumeration.KycStep;
 
@@ -59,15 +61,19 @@ public class Driver extends Auth {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    private Boolean active;
+    private Boolean active=true;
     
-    private Boolean isAvilable;
+    private Boolean isAvilable=true;
     
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     private List<Ride> rides = new ArrayList<>();
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")
+    @JsonIgnore
     private Wallet wallet;
+    
+    @Transient
+    private Long walletId;
  
 }

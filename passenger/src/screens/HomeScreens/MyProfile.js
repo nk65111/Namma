@@ -7,8 +7,27 @@ import Svg, { Path } from 'react-native-svg'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import tw from 'twrnc'
 import { colors } from '../../utils/constant'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { CommonActions, useNavigation } from '@react-navigation/native'
 
 function MyProfile() {
+
+  const navigator = useNavigation()
+
+  const logout = async () => {
+    const keys = ["raahi_token"]
+    await AsyncStorage.multiRemove(keys)
+    //navigation.navigate("Login");
+    navigator.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [
+          { name: "Login" }
+        ]
+      })
+    )
+
+  }
   return (
     <Animated.View entering={SlideInRight} exiting={SlideInLeft} style={tw`flex-1 flex-col pb-20`}>
       <LinearGradient colors={colors.gradient_blue} style={tw`h-[150px]`}>
@@ -44,7 +63,7 @@ function MyProfile() {
           </Svg>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={tw`bg-white shadow-xl shadow-gray-200 py-4 px-4 max-w-[300px] mx-auto rounded-2xl flex-row items-center`}>
+      <TouchableOpacity onPress={logout} style={tw`bg-white shadow-xl shadow-gray-200 py-4 px-4 max-w-[300px] mx-auto rounded-2xl flex-row items-center`}>
         <Text style={tw`text-xl font-medium flex-grow text-rose-500 text-center`}>Log Out</Text>
       </TouchableOpacity>
     </Animated.View>

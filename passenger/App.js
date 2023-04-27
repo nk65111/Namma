@@ -9,6 +9,7 @@ import PushNotification from 'react-native-push-notification'
 import { QueryClient, QueryClientProvider } from 'react-query';
 import Routes from './src/Routes'
 import { NativeBaseProvider, KeyboardAvoidingView } from "native-base";
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const App = () => {
 

@@ -39,6 +39,39 @@ export const decodeToken = async () => {
 // export const groupBy = (x, f) => x.reduce((a, b) => ((a[f(b)] ||= []).push(b), a), {});
 
 
+export const uploadImage = async (image) => {
+    console.log(image)
+    try {
+
+        const formData = new FormData();
+        formData.append('file', {
+            uri: image.uri,
+            type: image.type,
+            name: 'test.jpg'
+        });
+        formData.append('upload_preset', 'ankit_kumar');
+
+        const cloudinaryURL = 'https://api.cloudinary.com/v1_1/ankit628792/image/upload';
+
+        const response = await fetch(cloudinaryURL, {
+            method: 'POST',
+            body: formData
+        });
+
+        let res = await response.json();
+        if (res.secure_url)
+            console.log(`File "${image?.name}" Uploaded successfully`, { id: 'success' })
+        else
+            console.log(`Unable to Upload File "${image?.name}"`, { id: 'error' });
+
+        return res.secure_url
+
+    } catch (error) {
+        console.log("err ", error)
+        return null
+    }
+}
+
 export default function useDebounce(value, delay = 300) {
     const [debouncedValue, setDebouncedValue] = useState(value);
 
@@ -65,9 +98,7 @@ export const PickImage = async (Location) => {
                 multiple: false,
             })
                 .then((image) => {
-                    console.log('image', image)
-                    let newImageUrl = image.path
-                    resolve({ success: true, response: newImageUrl })
+                    resolve({ success: true, response: image })
                 })
                 .catch((error) => {
                     reject({ success: false, response: error })
@@ -85,9 +116,7 @@ export const PickImage = async (Location) => {
                 multiple: false,
             })
                 .then((image) => {
-                    console.log('image', image)
-                    let newImageUrl = image.path
-                    resolve({ success: true, response: newImageUrl })
+                    resolve({ success: true, response: image })
                 })
                 .catch((error) => {
                     reject({ success: false, response: error })

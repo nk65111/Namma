@@ -15,18 +15,12 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.namma.api.config.JwtUtil;
 import com.namma.api.config.SheduleRide;
+import com.namma.api.dto.AuthDto;
 import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.JwtRequest;
 import com.namma.api.dto.JwtResponse;
@@ -41,6 +35,8 @@ import com.namma.api.services.AbstractUserDetailsServiceImpl;
 import com.namma.api.services.CustomerService;
 import com.namma.api.services.RideService;
 import com.namma.api.services.SMSService;
+
+import ch.qos.logback.core.pattern.color.CyanCompositeConverter;
 
 @RestController
 @RequestMapping("/api/v1/customer")
@@ -100,8 +96,21 @@ public class CustomerController {
         UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
         CustomUserDetails customUserDetails= (CustomUserDetails)userDetails;
-        this.sheduleRide.auth=customUserDetails.getAuth();
-        return  ResponseEntity.ok(new JwtResponse(token));
+        Auth auth=customUserDetails.getAuth();
+        this.sheduleRide.auth=auth;
+        Customer customer=(Customer)auth;
+        customer.setWalletId(customer.getWallet().getId());
+        return  ResponseEntity.ok(new JwtResponse(token,customer));
+    }
+    
+    @PostMapping("/upload-profile")
+    public ResponseEntity<HashMap<String,String>> uploadProfile(@RequestParam(required = false,value = "profilePic")
+               MultipartFile profilePicImage,Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	String profileImage= this.customerService.uploadProfilePic(profilePicImage, auth.getId());
+    	HashMap<String, String> map=new HashMap<>();
+    	map.put("profile_Image", profileImage);
+    	return new ResponseEntity<HashMap<String,String>>(map,HttpStatus.OK);
     }
     
     @GetMapping("/customers")
@@ -113,15 +122,17 @@ public class CustomerController {
     @GetMapping("/profile")
     public ResponseEntity<Auth> getProfile(Principal principal) throws ResourceNotFoundException {
     	Auth auth= getAuthByJwt(principal);
+        Customer customer=(Customer)auth;
+        customer.setWalletId(customer.getWallet().getId());
     	return new ResponseEntity<>(auth, HttpStatus.OK);
     }
     
     @PutMapping("/update-profile")
-    public ResponseEntity<String> updateProfile(@Valid @RequestBody CustomerDto customerDto,Principal principal) throws ResourceNotFoundException{
+    public ResponseEntity<CustomerDto> updateProfile(@Valid @RequestBody CustomerDto customerDto,Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
     	customerDto.setId(auth.getId());
-    	customerService.updateProfile(customerDto);
-    	return new ResponseEntity<String>("Profile updated successfully", HttpStatus.OK);
+    	CustomerDto customerDto2= customerService.updateProfile(customerDto);
+    	return new ResponseEntity<CustomerDto>(customerDto2, HttpStatus.OK);
     }
 
     @DeleteMapping("/delete-profile")
@@ -169,10 +180,12 @@ public class CustomerController {
         }
     }
     
-    public Auth getAuthByJwt(Principal principal) {
+    public  Auth getAuthByJwt(Principal principal) {
     	CustomUserDetails userDetails= (CustomUserDetails)this.userDetailsServiceImpl.loadUserByUsername(principal.getName());
     	return userDetails.getAuth();
     }
+    
+   
     
     
     

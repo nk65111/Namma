@@ -9,7 +9,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { GOOGLE_MAP_API_KEY } from '../../services/config'
 import Map from '../../components/Map'
 import { selectCurrentLocation, selectTravelTimeInfo, setDestination } from '../../slices/travelSlice'
-
+import { selectUserDetails } from '../../slices/userSlice'
 
 const Search = ({ style }) => (
   <Svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={tw`w-7 h-7 ${style}`}>
@@ -21,12 +21,13 @@ const Search = ({ style }) => (
 function Home() {
   const dispatch = useDispatch();
   const currentLoc = useSelector(selectCurrentLocation)
-  const travelInfo = useSelector(selectTravelTimeInfo)
-
+  const travelInfo = useSelector(selectTravelTimeInfo);
+  const userInfo = useSelector(selectUserDetails)
+console.log("user info",userInfo)
   return (
     <Animated.View entering={FadeIn.duration(500)} style={tw`flex-1`}>
       <Animated.View entering={SlideInUp.duration(500)} style={[tw`p-4 pt-6 relative z-10 flex-row items-start justify-between w-full bg-white h-52`, { borderBottomRightRadius: 55 }]}>
-        <Text style={tw`text-3xl font-medium pl-4`}>Hi, Topi Kumar</Text>
+        <Text style={tw`text-3xl font-medium pl-4`}>Hi, {userInfo?.name || 'Topi Kumar'}</Text>
         <TouchableOpacity activeOpacity={0.9} style={tw`px-4 z-20 `}>
           <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
             uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"

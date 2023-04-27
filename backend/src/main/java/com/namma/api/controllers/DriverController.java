@@ -1,6 +1,7 @@
 package com.namma.api.controllers;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,15 +14,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,6 +29,7 @@ import com.namma.api.dto.JwtResponse;
 import com.namma.api.dto.RideDto;
 import com.namma.api.dto.RideResponse;
 import com.namma.api.entity.Auth;
+import com.namma.api.entity.Driver;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.security.CustomUserDetails;
@@ -89,8 +83,14 @@ public class DriverController {
 
         UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
-        return  ResponseEntity.ok(new JwtResponse(token));
+        CustomUserDetails customUserDetails= (CustomUserDetails)userDetails;
+        Auth auth=customUserDetails.getAuth();
+        Driver driver=(Driver)auth;
+        driver.setWalletId(driver.getWallet().getId());
+        return  ResponseEntity.ok(new JwtResponse(token,driver));
     }
+    
+ 
 
 
 
@@ -121,9 +121,9 @@ public class DriverController {
     
     
     @PostMapping("/kyc")
-    public ResponseEntity<String> kyc(@RequestParam("kycData") String  kycData,
-    		@RequestParam("drivingLicenceImage") MultipartFile drivingLicenceImage,
-    		@RequestParam("selfieImage") MultipartFile selfieImage, Principal principal) 
+    public ResponseEntity<String> kyc(@RequestParam(required = false,value = "kycData") String  kycData,
+    		@RequestParam(required = false,value =  "drivingLicenceImage") MultipartFile drivingLicenceImage,
+    		@RequestParam(required = false,value = "selfieImage") MultipartFile selfieImage, Principal principal) 
     				throws JsonMappingException, JsonProcessingException, ResourceNotFoundException {
     	
     	DriverKycDto driverKycDto=mapper.readValue(kycData, DriverKycDto.class);

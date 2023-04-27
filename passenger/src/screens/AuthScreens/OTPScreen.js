@@ -16,29 +16,29 @@ import { useSelector } from 'react-redux'
 import { selectToken } from '../../slices/userSlice'
 
 function OTPScreen({ route }) {
-    const navigation = useNavigation()
-    const [otp, setOtp] = useState('')
+    const navigator = useNavigation()
+    const [otp, setOtp] = useState('416130')
     const [error, setError] = useState('')
     const token = useSelector(selectToken)
 
 
-    const { mutate } = useValidateToken((data) => navigation.push(data.user?.onboardCount))
+    const { mutate } = useValidateToken((data) => navigator.navigate(data.user?.onboardCount || 'AboutYou'))
 
     const { isLoading, mutate: verifyOtp } = useVerifyOtp((token) => mutate(token))
 
     const handleSubmit = async () => {
-        if (otp === undefined || otp === "" || otp?.length !== 5) {
-            Vibration.vibrate(300);
-            setError("Invalid OTP");
-        } else {
-            let data = {
-                phoneNumber: route.params?.phoneNumber,
-                otp: otp,
-                fcmToken: await AsyncStorage.getItem('fcmToken')
-            };
+        // if (otp === undefined || otp === "" || otp?.length !== 6) {
+        //     Vibration.vibrate(300);
+        //     setError("Invalid OTP");
+        // } else {
+        // }
+        let data = {
+            phoneNumber: route.params?.phoneNumber || '9818451195',
+            otp: otp || "416130",
+            deviceToken: await AsyncStorage.getItem('fcmToken')
+        };
 
-            verifyOtp(token, data);
-        }
+        verifyOtp({ token, data });
     };
 
 
@@ -63,17 +63,17 @@ function OTPScreen({ route }) {
                     <View style={tw`flex-col items-center py-5 flex-grow`}>
                         <OTPTextView
                             handleTextChange={(e) => handleOtp(e)}
-                            textInputStyle={[tw`border border-b ${otp.toString().length == 5 ? 'border-blue-800' : 'border-gray-200'} text-xl rounded-xl p-2 ios:pb-3 w-10 h-12 text-center font-medium`, { color: colors.blue }]}
-                            inputCount={5}
+                            textInputStyle={[tw`border border-b ${otp.toString().length == 6 ? 'border-blue-800' : 'border-gray-200'} text-xl rounded-xl p-2 ios:pb-3 w-10 h-12 text-center font-medium`, { color: colors.blue }]}
+                            inputCount={6}
                             tintColor={colors.blue}
-                            offTintColor={otp.toString().length == 5 ? colors.blue : colors.grey}
+                            offTintColor={otp.toString().length == 6 ? colors.blue : colors.grey}
                             inputCellLength={1}
                         />
                         <Text style={tw`text-center text-red-400 text-base mt-4`}>{error}</Text>
                     </View>
 
                     <View style={tw`flex-row items-center justify-between w-full`}>
-                        <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} extra='my-6' />
+                        <SecondaryButton disabled={!navigator.canGoBack()} text={'Back'} onPress={() => navigator.goBack()} extra='my-6' />
                         <PrimaryButton text={"Continue"} disabled={isLoading} onPress={handleSubmit} extra='my-6' />
                     </View>
                 </View>

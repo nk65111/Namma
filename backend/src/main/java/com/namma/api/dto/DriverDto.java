@@ -19,4 +19,5 @@ public class DriverDto extends AuthDto {
 	private Integer age;
 	private KycStatus kycStatus;
 	private KycStep onboardingStep;
+	private Long walletId;
 }

@@ -7,8 +7,11 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import com.google.maps.model.LatLng;
@@ -23,10 +26,14 @@ import com.namma.api.repository.RideRepository;
 import com.namma.api.services.GoogleMapsService;
 import com.namma.api.services.NotificationService;
 
+import net.bytebuddy.asm.Advice.This;
+
 @Component
 public class SheduleRide {
+	
 
 	public static Auth auth;
+	
 	
 	@Autowired
 	private NotificationService notificationService;
@@ -42,12 +49,13 @@ public class SheduleRide {
 	
 	@Scheduled(fixedDelay = 6000)
 	public void sheduleTask() {	
-		
 		if(auth!=null) {
+			System.out.println("Runnig....");
 			LocalTime to=LocalTime.now();
 	        LocalTime from=to.plusMinutes(30);
 	        Instant dateInstant=Instant.now();
 	        List<Ride> rides=rideRepository.findRidesByDateAndTime(to, from,dateInstant,auth.getId());
+	        System.out.println(rides.size());
 	        if(rides!=null&&rides.size()!=0) {
 	            findSuitableDriver(rides.get(0));
 	        }

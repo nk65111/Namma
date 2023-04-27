@@ -17,17 +17,27 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.Transient;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.auto.value.AutoValue.Builder;
 import com.namma.api.enumeration.Gender;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 //@PrimaryKeyJoinColumn(name="customerId")
 public class Customer extends Auth {
 	
@@ -48,5 +58,11 @@ public class Customer extends Auth {
     
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "wallet_id", referencedColumnName = "id")
+    @JsonIgnore
     private Wallet wallet;
+    
+	private String profileImage;
+	
+	@Transient
+	private Long walletId;
 }
