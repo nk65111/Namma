@@ -21,7 +21,7 @@ function ProfilePic({ navigation }) {
     const { isLoading, mutate: updateProfile } = useUpdateProfile(() => navigation.push('HomeScreen'));
 
     const handleImageUpload = async (image) => {
-        updateProfile(token, { liscencePic: image })
+        updateProfile({ token, data: { liscencePic: image } })
     }
 
     const handleImage = async (Location) => {

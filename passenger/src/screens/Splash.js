@@ -10,9 +10,9 @@ function Splash({ setLoading }) {
       <AnimatedLottieView
         source={require('../assets/lottie/RoadTrip2.json')}
         autoPlay
-        loop={false}
+        loop={true}
         resizeMode={"contain"}
-        onAnimationFinish={() => setLoading && setLoading(false)}
+        // onAnimationFinish={() => setLoading && setLoading(false)}
       />
     </LinearGradient>
   )

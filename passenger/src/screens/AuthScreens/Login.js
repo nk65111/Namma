@@ -50,7 +50,8 @@ function Login() {
     })
     const handleSubmit = async () => {
         if (isValid() && phoneNumber?.length == 10) {
-            generateOtp(token, phoneNumber);
+
+            generateOtp({ token, phoneNumber });
             navigator.navigate('OTP', {
                 phoneNumber: phoneNumber,
             })

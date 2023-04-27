@@ -1,39 +1,74 @@
 import { useNavigation } from '@react-navigation/native'
 import { Box, FormControl, Input, Stack } from 'native-base'
 import React, { useState } from 'react'
-import { Alert, Text, View } from 'react-native'
+import { Alert, Text, TouchableOpacity, View, Image } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
 import BackButton from '../../components/BackButton'
 import PrimaryButton from '../../components/PrimaryButton'
 import SecondaryButton from '../../components/SecondaryButton'
-import { colors } from '../../utils/constant'
+import { PickImage, colors, uploadImage } from '../../utils/constant'
 import { useUpdateProfile } from '../../hooks'
 import { selectToken } from '../../slices/userSlice'
 import { useSelector } from 'react-redux'
+import Icon from 'react-native-vector-icons/EvilIcons'
 
 function AboutYou() {
     const token = useSelector(selectToken)
     const navigation = useNavigation()
+    const [imageUrl, setImageUrl] = useState('');
+
     const [formData, setFormData] = useState({
-        name: '',
-        liscenceNumber: '',
-        vehicleNumber: '',
-        vehicleModel: ''
+        name: 'Ankit'
     })
 
-    const { isLoading, mutate: updateProfile } = useUpdateProfile(() => navigation.navigate('ProfilePic'));
+    const { isLoading, mutate: updateProfile } = useUpdateProfile(() => navigation.navigate('HomeScreen'));
 
-    const handleSubmit = () => {
-        if (formData?.name || formData?.liscenceNumber || formData?.vehicleModel || formData?.vehicleNumber)
-            updateProfile(token, formData);
-        else
+    const handleImageUpload = async (image) => {
+
+        const source = {
+            uri: image.path,
+            type: image.mime ,
+            name: 'kuchbhi',
+          }
+        let url = await uploadImage(source);
+        updateProfile({ token, data: { image: url, name: formData.name } })
+    }
+
+    const handleImage = async () => {
+        let Handler = await PickImage()
+        console.log('handleImage -> Handler', Handler)
+        if (Handler?.success) {
+            setImageUrl(Handler?.response)
+        } else {
+            // console.log(Handler.response)
+        }
+    }
+    const handleNext = async () => {
+        if (formData?.name)
+            if (!imageUrl) {
+                Alert.alert('Please Upload Image')
+            } else {
+                Alert.alert(
+                    '',
+                    "Kindly ensure it's your actual picture preferably a formal one, for better curation.",
+
+                    [{ text: 'Next', onPress: () => handleImageUpload(imageUrl) }, { text: 'Cancel' }],
+                    {
+                        cancelable: true,
+                    }
+                )
+            }
+        else {
+
             Alert.alert('', 'Please fill all the details',
                 [{ text: 'Ok' }, {}],
                 {
                     cancelable: true,
                 })
+        }
+
     }
 
     return (
@@ -59,43 +94,24 @@ function AboutYou() {
                             </Stack>
                         </FormControl>
                     </Box>
-                    <Box w="100%" maxWidth="300px" style={tw`mb-4`}>
-                        <FormControl isRequired>
-                            <Stack mx="4">
-                                <FormControl.Label>Driving Liscence Number</FormControl.Label>
-                                <Input placeholder="DL14 20110012345" maxLength={16} value={formData?.liscenceNumber} onChangeText={(txt) => setFormData({ ...formData, liscenceNumber: txt })} style={tw`p-2 text-base ios:mb-2`} />
-                                <FormControl.ErrorMessage>
-                                    Invalid Format
-                                </FormControl.ErrorMessage>
-                            </Stack>
-                        </FormControl>
-                    </Box>
-                    <Box w="100%" maxWidth="300px" style={tw`mb-4`}>
-                        <FormControl isRequired>
-                            <Stack mx="4">
-                                <FormControl.Label>Vehicle Register Number</FormControl.Label>
-                                <Input placeholder="TN 75 AA 7106" maxLength={10} value={formData?.vehicleNumber} onChangeText={(txt) => setFormData({ ...formData, vehicleNumber: txt })} style={tw`p-2 text-base ios:mb-2`} />
-                                <FormControl.ErrorMessage>
-                                    Invalid Format
-                                </FormControl.ErrorMessage>
-                            </Stack>
-                        </FormControl>
-                    </Box>
-                    <Box w="100%" maxWidth="300px" style={tw`mb-4`}>
-                        <FormControl isRequired>
-                            <Stack mx="4">
-                                <FormControl.Label>Vehicle Model</FormControl.Label>
-                                <Input placeholder="Honda Civic" value={formData?.vehicleModel} onChangeText={(txt) => setFormData({ ...formData, vehicleModel: txt })} style={tw`p-2 text-base ios:mb-2`} />
-                                <FormControl.ErrorMessage>
-                                    Invalid Format
-                                </FormControl.ErrorMessage>
-                            </Stack>
-                        </FormControl>
-                    </Box>
+
+                    <View style={tw`w-full bg-white rounded-t-3xl flex-col`}>
+
+                        <TouchableOpacity onPress={() => handleImage()} style={tw`w-48 h-48 rounded-lg bg-gray-100 mx-auto my-6 flex-row items-center justify-center`}>
+                            <>
+                                {
+                                    Boolean(imageUrl) ?
+                                        <Image source={{ uri: imageUrl?.path }} resizeMode="cover" style={tw`h-full w-full rounded-lg`} />
+                                        :
+                                        <Icon name='image' size={100} style={tw`text-gray-600`} />
+                                }
+                            </>
+                        </TouchableOpacity>
+                    </View>
 
                     <View style={tw`flex-row items-center justify-between w-full pt-1`}>
                         <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} extra='my-6' />
-                        <PrimaryButton text={"Continue"} disabled={isLoading} onPress={handleSubmit} extra='my-6' />
+                        <PrimaryButton text={"Continue"} disabled={isLoading} onPress={handleNext} extra='my-6' />
                     </View>
                 </View>
 

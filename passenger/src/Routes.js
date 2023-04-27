@@ -21,6 +21,7 @@ import { Data, ridesData } from './utils/routeData'
 import { getLocation, useValidateToken } from './hooks'
 import { getToken } from './services/service'
 import { setToken } from './slices/userSlice'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 RNLocation.configure({
   distanceFilter: 1
@@ -42,11 +43,13 @@ function Routes() {
   }, [])
 
   const { isLoading, mutate } = useValidateToken((data) => {
-    if (data?.user) {
-      setJumpScreen(Data[data?.user?.onboardCount]);
-      setLoading(false)
+    if (data) {
+      setJumpScreen(Data[data?.onboardCount] || 'AboutYou');
     }
-  })
+    setLoading(false)
+  },
+    () => { setJumpScreen('AboutYou'); setLoading(false) }
+  )
 
   const verifyToken = async () => {
     let token = await getToken();
@@ -86,7 +89,6 @@ function Routes() {
       dispatch(setCurrentLocation({ "description": "", "location": { "lat": location?.latitude, "lng": location?.longitude } }));
       let place = await getLocation({ lat: location?.latitude, long: location?.longitude });
       place = place.data?.results[0]?.formatted_address;
-      console.log("place ", place)
       dispatch(setCurrentLocation({ "description": place || "", "location": { "lat": location?.latitude, "lng": location?.longitude } }))
     }
   }
@@ -137,9 +139,9 @@ function Routes() {
       </AuthStackNavigator.Navigator>
     )
   }
+  console.log(!loading, !isLoading)
 
-
-  return !loading && !isLoading && !animationLoading ? (
+  return !loading && !isLoading ? (
     <NavigationContainer>
       <AuthStack routename={jumpScreen} />
     </NavigationContainer>

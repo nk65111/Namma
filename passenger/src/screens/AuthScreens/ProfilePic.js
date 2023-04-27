@@ -21,7 +21,7 @@ function ProfilePic() {
     const { isLoading, mutate: updateProfile } = useUpdateProfile(() => navigation.navigate('LiscencePic'));
 
     const handleImageUpload = async (image) => {
-        updateProfile(token, { profilePic: image })
+        updateProfile({ token, data: { profilePic: image } })
     }
 
     const handleImage = async () => {
