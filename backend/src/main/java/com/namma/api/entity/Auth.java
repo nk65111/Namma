@@ -42,6 +42,7 @@ public class Auth implements Serializable{
 	private String name; 
 	
 	private String otp;
+
 	
 	private String deviceToken;
 }

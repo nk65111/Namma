@@ -1,6 +1,7 @@
 package com.namma.api.controllers;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import com.namma.api.dto.JwtResponse;
 import com.namma.api.dto.RideDto;
 import com.namma.api.dto.RideResponse;
 import com.namma.api.entity.Auth;
+import com.namma.api.entity.Driver;
 import com.namma.api.exception.PhoneNumberNotFoundException;
 import com.namma.api.exception.ResourceNotFoundException;
 import com.namma.api.security.CustomUserDetails;
@@ -79,8 +81,14 @@ public class DriverController {
 
         UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
-        return  ResponseEntity.ok(new JwtResponse(token));
+        CustomUserDetails customUserDetails= (CustomUserDetails)userDetails;
+        Auth auth=customUserDetails.getAuth();
+        Driver driver=(Driver)auth;
+        driver.setWalletId(driver.getWallet().getId());
+        return  ResponseEntity.ok(new JwtResponse(token,driver));
     }
+    
+ 
 
 
 
@@ -111,9 +119,9 @@ public class DriverController {
     
     
     @PostMapping("/kyc")
-    public ResponseEntity<String> kyc(@RequestParam("kycData") String  kycData,
-    		@RequestParam("drivingLicenceImage") MultipartFile drivingLicenceImage,
-    		@RequestParam("selfieImage") MultipartFile selfieImage, Principal principal) 
+    public ResponseEntity<String> kyc(@RequestParam(required = false,value = "kycData") String  kycData,
+    		@RequestParam(required = false,value =  "drivingLicenceImage") MultipartFile drivingLicenceImage,
+    		@RequestParam(required = false,value = "selfieImage") MultipartFile selfieImage, Principal principal) 
     				throws JsonMappingException, JsonProcessingException, ResourceNotFoundException {
     	
     	DriverKycDto driverKycDto=mapper.readValue(kycData, DriverKycDto.class);

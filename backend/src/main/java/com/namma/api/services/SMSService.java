@@ -31,7 +31,7 @@ public class SMSService {
 		Message message=Message.creator(
 				new PhoneNumber("+91"+phoneNumber), 
 				new PhoneNumber(TWILLIO_PHONE_NO), 
-				" Dear customer, the one time password (OTP) to reset your password at Raahi is "+token).create();
+				" Dear customer, the one time (OTP) to for  Raahi Ride is "+token).create();
 	}
 	
 	
