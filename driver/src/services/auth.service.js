@@ -13,17 +13,17 @@ export const AuthService = {
             }
         })
     },
-    verifyOtp: ({ phoneNumber, otp, deviceToken }) => {
+    verifyOtp: ({ phoneNumber, otp }) => {
         return fetch_({
             url: VERIFY_OTP,
             method: 'POST',
             headers: {
-                [PUBLIC_REQUEST_KEY]: true
+                [PUBLIC_REQUEST_KEY]: true,
+                'Content-Type': 'application/json'
             },
             data: {
-                phoneNumber,
-                otp,
-                deviceToken
+                phoneNumber: phoneNumber,
+                otp: otp
             }
         })
     },

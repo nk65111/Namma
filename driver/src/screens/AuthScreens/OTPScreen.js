@@ -29,8 +29,7 @@ function OTPScreen({ route }) {
             setIsLoading(true);
             AuthService.verifyOtp({
                 phoneNumber: route.params?.phoneNumber,
-                otp: otp,
-                deviceToken: GetLocalStorage('DEVICE_TOKEN')
+                otp: otp
             }).then(data => {
                 onSuccess(data)
             }).finally(() => setIsLoading(false));

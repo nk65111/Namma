@@ -73,20 +73,22 @@ public class DriverController {
 	
     @PostMapping("/verifyOtp")
     public ResponseEntity<?> genrateToken(@RequestBody JwtRequest jwtRequest) throws Exception {
+    	System.out.println(jwtRequest.getPhoneNumber()+" "+jwtRequest.getOtp());
         try {
            authentication(jwtRequest.getPhoneNumber(),jwtRequest.getOtp());
         }catch (UsernameNotFoundException e){
             e.printStackTrace();
             throw new Exception(e.getMessage());
         }
-
+//
         UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
         CustomUserDetails customUserDetails= (CustomUserDetails)userDetails;
         Auth auth=customUserDetails.getAuth();
         Driver driver=(Driver)auth;
-//        driver.setWalletId(driver.getWallet().getId());
+        driver.setWalletId(driver.getWallet().getId());
         return  ResponseEntity.ok(new JwtResponse(token,driver));
+    	//return null;
     }
     
  
