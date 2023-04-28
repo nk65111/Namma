@@ -26,7 +26,6 @@ const ProfilePic = ({ navigation }) => {
     }
 
     const handleNext = async () => {
-        uploadLicence();
         if (!image) {
             Alert.alert('Please Upload Image')
         } else {
@@ -43,9 +42,11 @@ const ProfilePic = ({ navigation }) => {
 
     const uploadLicence = (image) => {
         setIsLoading(true);
+        let formData = new FormData();
+        formData.set("drivingLicenceImage", image);
         DriverKycService.addKyc(image)
             .then(() => {
-                navigator.navigate('BANK_DETAIL', { image: image });
+                navigator.navigate('BANK_DETAIL');
             })
             .finally(() => setIsLoading(false))
     }

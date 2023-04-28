@@ -1,32 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import { NavigationContainer } from '@react-navigation/native'
-import { useReduxDevToolsExtension } from '@react-navigation/devtools'
-import Splash from './screens/Splash'
-import IntroScreen from './screens/IntroScreen'
-import { createStackNavigator } from '@react-navigation/stack'
-
-//screen 
-import NavigatorTab from './NavigatorTab';
-import Login from './screens/AuthScreens/Login'
-import OTPScreen from './screens/AuthScreens/OTPScreen'
-import LiscencePic from './screens/AuthScreens/LiscencePic';
-import BankDetail from './screens/AuthScreens/BankDetail';
-import VehicalDetail from './screens/AuthScreens/VehicalDetail';
-import ProfilePic from './screens/AuthScreens/ProfilePic';
-import AboutYou from './screens/AuthScreens/AboutYou';
-
+import React, { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { NavigationContainer } from '@react-navigation/native';
+import { useReduxDevToolsExtension } from '@react-navigation/devtools';
 import messaging from '@react-native-firebase/messaging';
 import RNLocation from 'react-native-location';
-import { useDispatch } from 'react-redux';
-import useSession from './hooks/useSession';
+
+//nav
+import AuthStack from './nav/AuthStack'
+import Splash from './screens/Splash';
 
 import { setCurrentLocation } from './slices/travelSlice';
 import { refetchLocation } from './utils/constant';
-
-import { Data } from './utils/routeData';
 import { getLocation } from './hooks';
-import { DriverService } from './services'
-import { navigate } from './helpers/RootNavigation'
+import { DriverService } from './services';
+import { GetLocalStorage, SetLocalStorage } from './helpers/FunctionHelper'
 
 RNLocation.configure({
   distanceFilter: 1
@@ -37,41 +24,26 @@ const Routes = () => {
   const dispatch = useDispatch();
   const navigationRef = React.useRef();
   useReduxDevToolsExtension(navigationRef);
-  const AuthStackNavigator = createStackNavigator();
-
-  const [user] = useSession();
-  const [jumpScreen, setJumpScreen] = React.useState('IntroScreen');
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState();
   const [userLocation, setUserLocation] = useState(null);
   const [animationLoading, setAnimationLoading] = useState(true);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [fcmToken, setFcmToken] = useState();
 
-  useEffect(() => {
-    if (user) {
-      if (user?.kycStatus !== 'COMPLETED') {
-        setJumpScreen(Data[user?.onboardCount]);
-        setLoading(false)
-      } else {
-        setJumpScreen("HomeScreen");
-      }
-    }
-  }, [user])
-
-  useEffect(() => {
-    if (jumpScreen) {
-      navigate(jumpScreen)
-    }
-  }, [jumpScreen])
-
-  const getFcmToken = async () => {
-    const fcmToken = await messaging().getToken();
-    if (fcmToken) {
-      setFcmToken(fcmToken);
-      console.log("Your Firebase Token is:", fcmToken);
-    } else {
-      console.log("Failed", "No token received");
+  const validateIsLogin = async () => {
+    const isAuth = await GetLocalStorage('IS_AUTH');
+    const userData = await GetLocalStorage('DRIVER_DATA', true);
+    const accessToken = await GetLocalStorage('AUTH_TOKEN_KEY');
+    console.log("data------", isAuth, userData, accessToken);
+    if (isAuth && userData && accessToken) {
+      setIsAuthChecked(true);
+      setUser(userData);
     }
   }
+
+  useEffect(() => {
+    validateIsLogin();
+  }, []);
 
   const permissionHandle = async () => {
     let location = ''
@@ -137,16 +109,16 @@ const Routes = () => {
     }
   }
 
-  useEffect(() => {
-    if (user?.id && fcmToken) {
-      DriverService.updateProfile({
-        deviceToken: fcmToken,
-      }).then(data => {
-        console.log(data);
-      })
+  const getFcmToken = async () => {
+    const fcmToken = await messaging().getToken();
+    if (fcmToken) {
+      SetLocalStorage('DEVICE_TOKEN', fcmToken);
+      setFcmToken(fcmToken);
+      console.log("Your Firebase Token is:", fcmToken);
+    } else {
+      console.log("Failed", "No token received");
     }
-  }, [user, fcmToken]);
-
+  }
 
   useEffect(() => {
     permissionHandle();
@@ -157,32 +129,21 @@ const Routes = () => {
       refetchLocation(dispatch)
     }, TIME_MS);
     return () => clearInterval(interval);
-  }, [])
+  }, []);
 
-  const AuthStack = ({ routeName }) => {
-    return (
-      <AuthStackNavigator.Navigator
-        screenOptions={{ headerShown: false, }}
-        initialRouteName={"IntroScreen"}
-      >
-        <>
-          <AuthStackNavigator.Screen name="IntroScreen" component={IntroScreen} />
-          <AuthStackNavigator.Screen name="Login" component={Login} />
-          <AuthStackNavigator.Screen name="OTP" component={OTPScreen} />
-          <AuthStackNavigator.Screen name="LIENCE_PIC" component={LiscencePic} />
-          <AuthStackNavigator.Screen name="BANK_DETAIL" component={BankDetail} />
-          <AuthStackNavigator.Screen name="VEHICLE_DETAIL" component={VehicalDetail} />
-          <AuthStackNavigator.Screen name="PROFILE_PIC" component={ProfilePic} />
-          <AuthStackNavigator.Screen name="AboutYou" component={AboutYou} />
-          <AuthStackNavigator.Screen name="HomeScreen" component={NavigatorTab} />
-        </>
-      </AuthStackNavigator.Navigator>
-    )
-  }
+  useEffect(() => {
+    if (isAuthChecked && fcmToken) {
+      DriverService.updateProfile({
+        deviceToken: fcmToken,
+      }).then(data => {
+        console.log(data);
+      })
+    }
+  }, [isAuthChecked, fcmToken]);
 
-  return !loading && !animationLoading ? (
+  return !animationLoading ? (
     <NavigationContainer>
-      <AuthStack />
+      <AuthStack user={user} />
     </NavigationContainer>
   ) :
     (

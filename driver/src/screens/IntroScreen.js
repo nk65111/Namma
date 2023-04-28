@@ -9,7 +9,7 @@ import { colors } from '../utils/constant'
 import IntroSVGComponent from '../svg/intro'
 
 function IntroScreen() {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   return (
     <Animated.View exiting={SlideInLeft} entering={FadeIn.duration(600)} style={tw`flex-1 items-center justify-center`}>
       <LinearGradient colors={colors.gradient_blue} style={tw`flex-1 items-center justify-center h-full w-full relative`}>

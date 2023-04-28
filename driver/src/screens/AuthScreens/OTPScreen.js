@@ -1,17 +1,18 @@
-import { useNavigation } from '@react-navigation/native'
-import { View } from 'native-base'
 import React, { useState } from 'react'
+import { View } from 'native-base'
 import { Text, Vibration } from 'react-native'
+import { useNavigation } from '@react-navigation/native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
+import OTPTextView from 'react-native-otp-textinput'
+
 import BackButton from '../../components/BackButton'
 import PrimaryButton from '../../components/PrimaryButton'
 import SecondaryButton from '../../components/SecondaryButton'
-import OTPTextView from 'react-native-otp-textinput'
+
+import { SetLocalStorage, GetLocalStorage } from '../../helpers/FunctionHelper';
 import { colors } from '../../utils/constant'
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SetLocalStorage } from '../../helpers/FunctionHelper';
 import { AuthService } from '../../services';
 
 function OTPScreen({ route }) {
@@ -26,11 +27,10 @@ function OTPScreen({ route }) {
             setError("Invalid OTP");
         } else {
             setIsLoading(true);
-            console.log('phoneNumber', route.params?.phoneNumber);
             AuthService.verifyOtp({
                 phoneNumber: route.params?.phoneNumber,
                 otp: otp,
-                deviceToken: await AsyncStorage.getItem('fcmToken')
+                deviceToken: GetLocalStorage('DEVICE_TOKEN')
             }).then(data => {
                 onSuccess(data)
             }).finally(() => setIsLoading(false));
@@ -38,15 +38,15 @@ function OTPScreen({ route }) {
     };
 
     const onSuccess = (data) => {
-        console.log("data", data);
-        const { data: { auth, token } = {} } = data;
+        const { customer, token } = data;
         SetLocalStorage('IS_AUTH', '1');
-        SetLocalStorage('DTIVER_DATA', auth);
-        SetLocalStorage(AUTH_TOKEN_KEY, token);
-        if (auth?.kycStatus === 'COMPLETED') {
+        SetLocalStorage('DRIVER_DATA', JSON.stringify(customer));
+        SetLocalStorage('AUTH_TOKEN_KEY', token);
+
+        if (customer?.kycStatus === 'COMPLETED') {
             navigation.navigate('HomeScreen');
         } else {
-            navigation.navigate(auth?.onboardingStep || 'LIENCE_PIC');
+            navigation.navigate(customer?.onboardingStep || 'DRIVING_LICENCE');
         }
     }
 

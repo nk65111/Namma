@@ -56,7 +56,10 @@ export const SetLocalStorage = async (key, value) => {
 
 export const GetLocalStorage = async (key, parse = false) => {
     try {
-        let value = await AsyncStorage.getItem(key)
+        let value = await AsyncStorage.getItem(key);
+        if (!value) {
+            return null; // handle null or empty string values
+        }
         if (parse) {
             try {
                 value = JSON.parse(value);
@@ -64,6 +67,7 @@ export const GetLocalStorage = async (key, parse = false) => {
                 console.log("Parsing Error", e)
             }
         }
+        // console.log("----------------key: ", value);
         return value;
     } catch (e) {
         // error reading value

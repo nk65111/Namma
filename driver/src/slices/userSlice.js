@@ -1,4 +1,5 @@
-import { configureStore, createSlice } from '@reduxjs/toolkit'
+import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { GetLocalStorage } from '../helpers/FunctionHelper';
 
 export const userSlice = createSlice({
     name: 'user',
@@ -14,11 +15,12 @@ export const userSlice = createSlice({
             state.token = action.payload.token
         },
     },
-})
+});
+
 
 // Action creators are generated for each case reducer function
 export const { setUserDetails, setToken } = userSlice.actions
 export const selectUserDetails = (state) => state.user.userDetails;
 export const selectToken = (state) => state.user.token
 
-export default userSlice.reducer
+export default userSlice.reducer;
