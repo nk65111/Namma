@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -48,6 +49,7 @@ public class Driver extends Auth {
 	private KycStep onboardingStep;
 	
 	@OneToOne(mappedBy = "driver")
+	@JsonIgnore
 	private DriverKyc driverKyc; 
 	
 	@OneToOne(mappedBy = "driver")
@@ -61,11 +63,11 @@ public class Driver extends Auth {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    private Boolean active=true;
+    private Boolean active;
     
-    private Boolean isAvilable=true;
+    private Boolean isAvilable;
     
-    @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "driver", fetch = FetchType.EAGER)
     private List<Ride> rides = new ArrayList<>();
     
     @OneToOne(cascade = CascadeType.ALL)
@@ -75,5 +77,8 @@ public class Driver extends Auth {
     
     @Transient
     private Long walletId;
+    
+    @Transient
+    private Long kycId;
  
 }

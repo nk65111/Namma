@@ -6,7 +6,7 @@ import {
 } from "../slices/travelSlice";
 import { useDispatch, useSelector } from "react-redux";
 
-import { GOOGLE_MAP_API_KEY } from "../services/config";
+import { GOOGLE_MAP_API_KEY } from "../common/config";
 import MapViewDirections from "react-native-maps-directions";
 import { StyleSheet } from "react-native";
 import { useGetTravelTime } from "../hooks";

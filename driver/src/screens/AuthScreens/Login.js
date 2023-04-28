@@ -1,66 +1,37 @@
+import React, { useState } from 'react'
+import { Text } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { View, Box, FormControl, Stack, Input } from 'native-base'
-import React from 'react'
-import { Text, Vibration } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
 import BackButton from '../../components/BackButton'
 import PrimaryButton from '../../components/PrimaryButton'
-import { colors } from '../../utils/constant'
-import { useState } from 'react'
-import { useGenerateOtp } from '../../hooks'
-import { useSelector } from 'react-redux'
-import { selectToken } from '../../slices/userSlice'
+import { colors } from '../../utils/constant';
 
-// regex for valid number
-const MobileNumberRegex = RegExp(/^[6-9]\d{9}$/i)
+import { showToast } from '../../helpers/FunctionHelper';
+import { isValidMobile } from '../../common/validation';
+import { isEmpty } from 'lodash';
+import { AuthService } from '../../services';
 
 function Login() {
     const navigator = useNavigation();
-    const [phoneNumber, setPhoneNumber] = useState('')
-    const [error, setError] = useState('');
-    const token = useSelector(selectToken)
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
-    function handleTextChange(value) {
-        setPhoneNumber(value)
-    }
-
-    function isValid() {
-        let errors = ''
-        if (phoneNumber === '') {
-            errors = 'Mobile Number is required';
-            setError(errors)
-            Vibration.vibrate(300);
-            return false
-        } else if (!MobileNumberRegex.test(phoneNumber)) {
-            errors = 'Not a valid Mobile Number';
-            setError(errors)
-            Vibration.vibrate(300);
-            return false
-        }
-        else { return true }
-    }
-
-    const { isLoading, mutate: generateOtp } = useGenerateOtp(() => {
-        navigator.navigate('OTP', {
-            phoneNumber: phoneNumber,
-        })
-        setPhoneNumber('')
-    })
-    const handleSubmit = async () => {
-        if (isValid() && phoneNumber?.length == 10) {
-            generateOtp(token, phoneNumber);
-            navigator.navigate('OTP', {
-                phoneNumber: phoneNumber,
-            })
-            setPhoneNumber('')
+    const onSendOtp = () => {
+        if (isEmpty(phoneNumber) && !isValidMobile(phoneNumber)) {
+            showToast("Please enter valid mobile number");
         } else {
-            Vibration.vibrate(300);
-            setError('Invalid Phone Number')
+            setIsLoading(true);
+            AuthService.sendOtp(phoneNumber)
+                .then(() => {
+                    console.log("mobile", phoneNumber)
+                    navigator.navigate('OTP', { phoneNumber: phoneNumber });
+                })
+                .finally(() => setIsLoading(false))
         }
     }
-
 
     return (
         <Animated.View exiting={SlideInLeft} entering={SlideInRight} style={tw`flex-1 items-center justify-center relative`}>
@@ -81,14 +52,22 @@ function Login() {
                                 <Stack mx="4" style={tw`py-4`}>
                                     <View style={tw`relative`}>
                                         <Text style={tw`absolute top-0.5 h-full left-2.5 text-lg py-1.5`}>+91</Text>
-                                        <Input keyboardType={'number-pad'} maxLength={10} type="number" value={phoneNumber} onChangeText={handleTextChange} placeholder="9878797936" style={[tw`py-2 pl-12 text-lg ios:mb-2`, { letterSpacing: 2 }]} />
+                                        <Input
+                                            keyboardType={'number-pad'}
+                                            maxLength={10}
+                                            type="number"
+                                            value={phoneNumber}
+                                            onChangeText={(val) => setPhoneNumber(val)} placeholder="9878797936"
+                                            style={[tw`py-2 pl-12 text-lg ios:mb-2`,
+                                            { letterSpacing: 2 }]}
+                                        />
                                     </View>
                                 </Stack>
                             </FormControl>
                         </Box>
-                        <Text style={tw`text-center text-red-400 text-base`}>{error}</Text>
+                        {/* <Text style={tw`text-center text-red-400 text-base`}>{error}</Text> */}
                     </View>
-                    <PrimaryButton disabled={isLoading} onPress={handleSubmit} text={"Send OTP"} extra={'px-10 mx-auto my-6'} />
+                    <PrimaryButton disabled={isLoading} onPress={onSendOtp} text={"Send OTP"} extra={'px-10 mx-auto my-6'} />
                 </View>
             </LinearGradient>
         </Animated.View>

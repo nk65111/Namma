@@ -2,6 +2,8 @@ package com.namma.api.services;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.DriverDto;
 import com.namma.api.dto.DriverKycDto;
@@ -12,9 +14,9 @@ import com.namma.api.exception.ResourceNotFoundException;
 
 public interface DriverService {
 	public String generateOtp(String phoneNumber);
-	public void verifyOtp(String phoneNumber, String otp) throws OtpNotValidException, PhoneNumberNotFoundException;
+	public void verifyOtp(String phoneNumber, String otp,  String deviceToken) throws OtpNotValidException, PhoneNumberNotFoundException;
 	
-	public void registerDriverKyc(DriverKycDto driverKycDto) throws ResourceNotFoundException;
+//	public void registerDriverKyc(DriverKycDto driverKycDto) throws ResourceNotFoundException;
 	public DriverKycDto getDriverKycDetails(long driverId) throws ResourceNotFoundException;
 	//public DriverDto updateProfile(DriverDto driverDto) throws PhoneNumberNotFoundException;
 	
@@ -24,6 +26,14 @@ public interface DriverService {
 	public void deleteProfile(Long driverId) throws ResourceNotFoundException;
 	
 	public void updateDriverLocation(DriverLocationDto driverLocationDto) throws ResourceNotFoundException;
+	
+	public String uploadLicence(MultipartFile licence,Long driverId) throws ResourceNotFoundException;
+	
+	public void uploadBankDetails(DriverKycDto driverKycDto,Long driverId) throws ResourceNotFoundException;
+	
+	public void uploadVehicleDetails(DriverKycDto driverKycDto,Long driverId) throws ResourceNotFoundException;
+	
+	String uploadSelfie(MultipartFile selfie,Long driverId) throws ResourceNotFoundException; 
 	
 }
   

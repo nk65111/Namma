@@ -12,4 +12,5 @@ import lombok.Setter;
 public class JwtRequest {
     private String phoneNumber;
     private String otp;
+    private String deviceToken;
 }

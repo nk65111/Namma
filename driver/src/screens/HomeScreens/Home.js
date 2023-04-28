@@ -6,7 +6,7 @@ import Svg, { Path } from 'react-native-svg'
 import tw from 'twrnc'
 import { useDispatch, useSelector } from 'react-redux'
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { GOOGLE_MAP_API_KEY } from '../../services/config'
+import { GOOGLE_MAP_API_KEY } from '../../common/config'
 import Map from '../../components/Map'
 import { selectCurrentLocation, selectTravelTimeInfo, setDestination } from '../../slices/travelSlice'
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
-import store from './src/utils/store'
+import store from './src/slices/store'
 import './src/utils/ignore'
 import { Alert, BackHandler, Keyboard, Linking, Platform, SafeAreaView, Text, TouchableWithoutFeedback } from 'react-native'
 import { notificationListener, requestUserPermission } from './src/utils/notificationService'
@@ -11,12 +11,8 @@ import Routes from './src/Routes'
 import { NativeBaseProvider, KeyboardAvoidingView } from "native-base";
 
 const App = () => {
-
   const queryClient = new QueryClient()
-
-  const disableBackButton = () => {
-    return true
-  }
+  const disableBackButton = () => { return true }
 
   const createChannels = () => {
     PushNotification.createChannel({
@@ -27,7 +23,6 @@ const App = () => {
 
 
   useEffect(() => {
-    // checkUpdateNeeded()
     BackHandler.addEventListener('hardwareBackPress', disableBackButton)
     return BackHandler.removeEventListener('hardwareBackPress', disableBackButton)
   }, [])
@@ -44,17 +39,14 @@ const App = () => {
           },
         },
       ])
-      //Alert the user and direct to the app url
     }
   }
-
 
   useEffect(() => {
     requestUserPermission();
     notificationListener();
     createChannels();
   }, [])
-
 
   return (
     <QueryClientProvider client={queryClient}>
