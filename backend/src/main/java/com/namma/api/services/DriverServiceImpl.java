@@ -75,15 +75,13 @@ public class DriverServiceImpl implements DriverService {
 	        wallet.setDriver(saveDriver);
 	        wallet.setWalletOwner(WalletOwner.DRIVER);
 	        wallet.setBalance(new BigDecimal(500));
+	        walletRepository.save(wallet);
+	        saveDriver.setWallet(wallet);
 	        
 	        DriverKyc driverKyc = new DriverKyc();
-	        driverKyc.setDriver(saveDriver);
-	        
-	        driverKycRepository.save(driverKyc);
-	        walletRepository.save(wallet);
-	  
-	        saveDriver.setWallet(wallet);
-	        saveDriver.setDriverKyc(driverKyc);
+	        driverKyc.setCreatedAt(LocalDateTime.now());
+	        DriverKyc newdriverKyc = driverKycRepository.save(driverKyc);
+	        saveDriver.setDriverKyc(newdriverKyc);
 	        
 	    	driverRepository.save(saveDriver);
 		}else {
@@ -298,17 +296,17 @@ public class DriverServiceImpl implements DriverService {
     	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
     	String drivingLicenceUrl="https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png";
     	if(licence!=null) {
-        	 drivingLicenceUrl=uploadFileUtility.uploadFile(licence);
+        	drivingLicenceUrl=uploadFileUtility.uploadFile(licence);
             driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
             driverOptional.get().setKycStatus(KycStatus.PARTIALLY_COMPLETED);
+            driverOptional.get().setOnboardingStep(KycStep.BANK_DETAIL);
         }else {
         	driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
         }
+    	
     	driverRepository.save(driverOptional.get());
-    	 driverKycRepository.save(driverKyc);
-    	 return drivingLicenceUrl;
-    	
-    	
+    	driverKycRepository.save(driverKyc);
+    	return drivingLicenceUrl;
 	}
 
 	@Override
@@ -322,8 +320,11 @@ public class DriverServiceImpl implements DriverService {
     	driverKyc.setBankAccountNumber(driverKycDto.getBankAccountNumber());
     	driverKyc.setIfscCode(driverKycDto.getIfscCode());
     	driverKyc.setAccountHolderName(driverKycDto.getAccountHolderName());
-    	
     	driverKycRepository.save(driverKyc);
+    	
+    	//update step
+    	driverOptional.get().setOnboardingStep(KycStep.VEHICLE_DETAIL);
+    	driverRepository.save(driverOptional.get());
 		
 	}
 
@@ -337,9 +338,11 @@ public class DriverServiceImpl implements DriverService {
     	driverKyc.setVehicleModel(driverKycDto.getVehicleModel());
     	driverKyc.setDrivingLicenseNumber(driverKycDto.getDrivingLicenseNumber());
     	driverKyc.setVehicleRegistrationNumber(driverKycDto.getVehicleRegistrationNumber());
-    	driverOptional.get().setKycStatus(KycStatus.COMPLETED);
-    	driverRepository.save(driverOptional.get());
     	driverKycRepository.save(driverKyc);
+    	
+    	//update step
+    	driverOptional.get().setOnboardingStep(KycStep.PROFILE_PIC);
+    	driverRepository.save(driverOptional.get());
 	}
 
 	@Override
@@ -354,12 +357,14 @@ public class DriverServiceImpl implements DriverService {
     	if(selfie!=null) {
     		selieUrl=uploadFileUtility.uploadFile(selfie);
             driverKyc.setDrivingLicenceImgae(selieUrl);
-            driverOptional.get().setKycStatus(KycStatus.PARTIALLY_COMPLETED);
+            driverOptional.get().setKycStatus(KycStatus.COMPLETED);
+            driverOptional.get().setOnboardingStep(KycStep.PROFILE_PIC);
         }else {
         	driverKyc.setDrivingLicenceImgae(selieUrl);
         }
+    	
     	driverRepository.save(driverOptional.get());
-    	 driverKycRepository.save(driverKyc);
-    	 return selieUrl;
+    	driverKycRepository.save(driverKyc);
+    	return selieUrl;
 	}
 }

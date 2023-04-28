@@ -157,14 +157,14 @@ public class DriverController {
     
     
     
-    @PutMapping("/upload-bankDetails")
+    @PutMapping("/upload-bankdetails")
     public ResponseEntity<String> uploadBankDetails(@RequestBody DriverKycDto driverKycDto,Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
     	this.driverService.uploadBankDetails(driverKycDto, auth.getId());
     	return new ResponseEntity<String>("Updated Bank Details",HttpStatus.OK);
     }
     
-    @PutMapping("/upload-vehicleDetails")
+    @PutMapping("/upload-vehicledetails")
     public ResponseEntity<String> uploadVehicleDetils(@RequestBody DriverKycDto driverKycDto,Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
     	this.driverService.uploadVehicleDetails(driverKycDto, auth.getId());
