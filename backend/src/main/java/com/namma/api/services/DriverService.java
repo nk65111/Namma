@@ -27,13 +27,13 @@ public interface DriverService {
 	
 	public void updateDriverLocation(DriverLocationDto driverLocationDto) throws ResourceNotFoundException;
 	
-	public String uploadLicence(MultipartFile licence,Long driverId) throws ResourceNotFoundException;
+	public DriverDto uploadLicence(MultipartFile licence,Long driverId) throws ResourceNotFoundException;
 	
-	public void uploadBankDetails(DriverKycDto driverKycDto,Long driverId) throws ResourceNotFoundException;
+	public DriverDto uploadBankDetails(DriverKycDto driverKycDto,Long driverId) throws ResourceNotFoundException;
 	
-	public void uploadVehicleDetails(DriverKycDto driverKycDto,Long driverId) throws ResourceNotFoundException;
+	public DriverDto uploadVehicleDetails(DriverKycDto driverKycDto,Long driverId) throws ResourceNotFoundException;
 	
-	String uploadSelfie(MultipartFile selfie,Long driverId) throws ResourceNotFoundException; 
+	public DriverDto uploadSelfie(MultipartFile selfie,Long driverId) throws ResourceNotFoundException; 
 	
 }
   

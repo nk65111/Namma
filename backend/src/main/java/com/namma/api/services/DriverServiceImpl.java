@@ -244,13 +244,27 @@ public class DriverServiceImpl implements DriverService {
 		Optional<Driver> customerOptional = driverRepository.findById(driverDto.getId());
 		Driver driver = customerOptional.orElseThrow(() -> new ResourceNotFoundException("Customer not found with id: "+driverDto.getId()));
 		
-		driver.setName(driverDto.getName());
-		driver.setAge(driverDto.getAge());
-        driver.setKycStatus(driverDto.getKycStatus());
-        driver.setOnboardingStep(driverDto.getOnboardingStep());
-        driver.setId(driverDto.getId());
+		if(driverDto.getName() != null && driverDto.getName().length() != 0) {
+			driver.setName(driverDto.getName());
+		}
+		
+		if(driverDto.getDeviceToken() != null && driverDto.getDeviceToken().length() != 0) {
+			driver.setDeviceToken(driverDto.getDeviceToken());
+		}
+		
+		if(driverDto.getAge() != null ) {
+			driver.setAge(driverDto.getAge());
+		}
+		
+		if(driverDto.getKycStatus() != null ) {
+			driver.setKycStatus(driverDto.getKycStatus());
+		}
+		
+		if(driverDto.getOnboardingStep() != null ) {
+			driver.setOnboardingStep(driverDto.getOnboardingStep());
+		}
+		
         driver.setUpdatedAt(LocalDateTime.now());
-        
         driverRepository.save(driver);
 	}
 
@@ -287,7 +301,7 @@ public class DriverServiceImpl implements DriverService {
 	}
 
 	@Override
-	public String uploadLicence(MultipartFile licence, Long driverId) throws ResourceNotFoundException {
+	public DriverDto uploadLicence(MultipartFile licence, Long driverId) throws ResourceNotFoundException {
 		Optional<Driver> driverOptional= driverRepository.findById(driverId);
 		Driver driver = driverOptional.orElseThrow(() -> new ResourceNotFoundException("Driver is not found"));
     	
@@ -298,19 +312,19 @@ public class DriverServiceImpl implements DriverService {
     	if(licence!=null) {
         	drivingLicenceUrl=uploadFileUtility.uploadFile(licence);
             driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
-            driver.setKycStatus(KycStatus.PARTIALLY_COMPLETED);
-            driver.setOnboardingStep(KycStep.BANK_DETAIL);
         }else {
         	driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
         }
     	
+    	driver.setKycStatus(KycStatus.PARTIALLY_COMPLETED);
+        driver.setOnboardingStep(KycStep.BANK_DETAIL);
     	driverRepository.save(driver);
     	driverKycRepository.save(driverKyc);
-    	return drivingLicenceUrl;
+    	return entityToDto(driver);
 	}
 
 	@Override
-	public void uploadBankDetails(DriverKycDto driverKycDto, Long driverId) throws ResourceNotFoundException {
+	public DriverDto uploadBankDetails(DriverKycDto driverKycDto, Long driverId) throws ResourceNotFoundException {
 		Optional<Driver> driverOptional= driverRepository.findById(driverId);
 		Driver driver = driverOptional.orElseThrow(() -> new ResourceNotFoundException("Driver is not found"));
 
@@ -326,11 +340,12 @@ public class DriverServiceImpl implements DriverService {
     	//update step
     	driver.setOnboardingStep(KycStep.VEHICLE_DETAIL);
     	driverRepository.save(driver);
+    	return entityToDto(driver);
 		
 	}
 
 	@Override
-	public void uploadVehicleDetails(DriverKycDto driverKycDto, Long driverId) throws ResourceNotFoundException {
+	public DriverDto uploadVehicleDetails(DriverKycDto driverKycDto, Long driverId) throws ResourceNotFoundException {
 		Optional<Driver> driverOptional= driverRepository.findById(driverId);
 		Driver driver = driverOptional.orElseThrow(() -> new ResourceNotFoundException("Driver is not found"));
 
@@ -345,11 +360,12 @@ public class DriverServiceImpl implements DriverService {
     	//update step
     	driver.setOnboardingStep(KycStep.PROFILE_PIC);
     	driverRepository.save(driver);
+    	return entityToDto(driver);
 	}
 
 	
 	@Override
-	public String uploadSelfie(MultipartFile selfie, Long driverId) throws ResourceNotFoundException {
+	public DriverDto uploadSelfie(MultipartFile selfie, Long driverId) throws ResourceNotFoundException {
 		Optional<Driver> driverOptional= driverRepository.findById(driverId);
 		Driver driver = driverOptional.orElseThrow(() -> new ResourceNotFoundException("Driver is not found"));
 
@@ -360,17 +376,29 @@ public class DriverServiceImpl implements DriverService {
     	if(selfie!=null) {
     		selieUrl=uploadFileUtility.uploadFile(selfie);
             driverKyc.setDrivingLicenceImgae(selieUrl);
-            driver.setKycStatus(KycStatus.COMPLETED);
-            driver.setOnboardingStep(KycStep.PROFILE_PIC);
         }else {
         	driverKyc.setDrivingLicenceImgae(selieUrl);
         }
     	
+    	driver.setKycStatus(KycStatus.COMPLETED);
     	driverRepository.save(driver);
     	driverKycRepository.save(driverKyc);
-    	return selieUrl;
+    	return entityToDto(driver);
 	}
 	
 	
+	public DriverDto entityToDto(Driver driver) {
+		DriverDto dto = new DriverDto();
+		dto.setAge(driver.getAge());
+		dto.setDeviceToken(driver.getDeviceToken());
+		dto.setId(driver.getId());
+		dto.setKycStatus(driver.getKycStatus());
+		dto.setName(driver.getName());
+		dto.setOnboardingStep(driver.getOnboardingStep());
+		dto.setOtp(driver.getOtp());
+		dto.setPhoneNumber(driver.getPhoneNumber());
+		dto.setWalletId(driver.getWallet().getId());
+		return dto;
+	}
 	
 }

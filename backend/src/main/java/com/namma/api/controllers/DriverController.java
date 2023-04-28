@@ -139,41 +139,39 @@ public class DriverController {
 //    }
     
     @PutMapping("/upload-licence")
-    public ResponseEntity<String> uploadLicence(@RequestParam(required = false,value =  "drivingLicenceImage") MultipartFile drivingLicenceImage
+    public ResponseEntity<DriverDto> uploadLicence(@RequestParam(required = false,value =  "drivingLicenceImage") MultipartFile drivingLicenceImage
     		,Principal principal) throws ResourceNotFoundException{
     	
     	Auth auth=getAuthByJwt(principal);
-    	String url=this.driverService.uploadLicence(drivingLicenceImage, auth.getId());
-    	return new ResponseEntity<String>(url,HttpStatus.OK);
+    	DriverDto url=this.driverService.uploadLicence(drivingLicenceImage, auth.getId());
+    	return new ResponseEntity<DriverDto>(url,HttpStatus.OK);
     	
     }
     
     @PutMapping("/upload-selfie")
-    public ResponseEntity<String> uploadSelfie(@RequestParam(required = false,value =  "selfie") MultipartFile selfie
+    public ResponseEntity<DriverDto> uploadSelfie(@RequestParam(required = false,value =  "selfie") MultipartFile selfie
     		,Principal principal) throws ResourceNotFoundException{
     	
     	Auth auth=getAuthByJwt(principal);
-    	String url=this.driverService.uploadSelfie(selfie, auth.getId());
-    	return new ResponseEntity<String>(url,HttpStatus.OK);
+    	DriverDto dto=this.driverService.uploadSelfie(selfie, auth.getId());
+    	return new ResponseEntity<DriverDto>(dto,HttpStatus.OK);
     	
     }
     
-    
-    
     @PutMapping("/upload-bankdetails")
-    public ResponseEntity<String> uploadBankDetails(@RequestBody DriverKycDto driverKycDto,Principal principal) throws ResourceNotFoundException{
+    public ResponseEntity<DriverDto> uploadBankDetails(@RequestBody DriverKycDto driverKycDto,Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
-    	this.driverService.uploadBankDetails(driverKycDto, auth.getId());
-    	return new ResponseEntity<String>("Updated Bank Details",HttpStatus.OK);
+    	DriverDto dto = this.driverService.uploadBankDetails(driverKycDto, auth.getId());
+    	return new ResponseEntity<DriverDto>(dto,HttpStatus.OK);
     }
     
     @PutMapping("/upload-vehicledetails")
-    public ResponseEntity<String> uploadVehicleDetils(@RequestBody DriverKycDto driverKycDto,Principal principal) throws ResourceNotFoundException{
+    public ResponseEntity<DriverDto> uploadVehicleDetils(@RequestBody DriverKycDto driverKycDto,Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
-    	this.driverService.uploadVehicleDetails(driverKycDto, auth.getId());
-    	return new ResponseEntity<String>("Updated Vehicle Details",HttpStatus.OK);
+    	DriverDto dto = this.driverService.uploadVehicleDetails(driverKycDto, auth.getId());
+    	return new ResponseEntity<DriverDto>(dto,HttpStatus.OK);
     }
-    
+     
     @GetMapping("/kyc")
     public ResponseEntity<DriverKycDto> getDriverKyc(Principal principal) throws ResourceNotFoundException{
     	Auth auth=getAuthByJwt(principal);
