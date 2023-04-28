@@ -49,6 +49,7 @@ public class Driver extends Auth {
 	private KycStep onboardingStep;
 	
 	@OneToOne(mappedBy = "driver")
+	@JsonIgnore
 	private DriverKyc driverKyc; 
 	
 	@OneToOne(mappedBy = "driver")
@@ -76,5 +77,8 @@ public class Driver extends Auth {
     
     @Transient
     private Long walletId;
+    
+    @Transient
+    private Long kycId;
  
 }

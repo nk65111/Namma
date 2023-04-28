@@ -119,14 +119,14 @@ public class SheduleRide {
 		    		
 		    		NotificationDto notificationDto = new NotificationDto();
 		    		notificationDto.setTitle("New Booking");
-		    		notificationDto.setMessage("you have assign a passanger");
+		    		notificationDto.setMessage("you have assign a new passaneger");
 		    		notificationDto.setToken(ride.getDriver().getDeviceToken());
 		    		notificationDto.setRideId(ride.getId());
 		    		this.notificationService.sendNotification(notificationDto);
 		    		
 		    		NotificationDto notificationDtoForUser = new NotificationDto();
 		    		notificationDtoForUser.setTitle("Accept Booking");
-		    		notificationDtoForUser.setMessage("you have assign a driver");
+		    		notificationDtoForUser.setMessage("you have assign driver for upcoming ride");
 		    		notificationDtoForUser.setToken(ride.getCustomer().getDeviceToken());
 		    		notificationDtoForUser.setRideId(ride.getId());
 		    		this.notificationService.sendNotification(notificationDtoForUser);

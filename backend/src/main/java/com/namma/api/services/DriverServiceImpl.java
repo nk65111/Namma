@@ -77,13 +77,13 @@ public class DriverServiceImpl implements DriverService {
 	        wallet.setBalance(new BigDecimal(500));
 	        walletRepository.save(wallet);
 	        saveDriver.setWallet(wallet);
-	        
+	    	driverRepository.save(saveDriver);
+	    	
 	        DriverKyc driverKyc = new DriverKyc();
 	        driverKyc.setCreatedAt(LocalDateTime.now());
-	        DriverKyc newdriverKyc = driverKycRepository.save(driverKyc);
-	        saveDriver.setDriverKyc(newdriverKyc);
+	        driverKyc.setDriver(saveDriver);
+	        this.driverKycRepository.save(driverKyc);
 	        
-	    	driverRepository.save(saveDriver);
 		}else {
 			Driver driver = existingAuth.get();
 			driver.setOtp(bCryptPasswordEncoder.encode(token));
