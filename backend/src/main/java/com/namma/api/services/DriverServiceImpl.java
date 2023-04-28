@@ -18,6 +18,8 @@ import com.namma.api.entity.Driver;
 import com.namma.api.entity.DriverKyc;
 import com.namma.api.entity.DriverLocation;
 import com.namma.api.entity.Wallet;
+import com.namma.api.enumeration.KycStatus;
+import com.namma.api.enumeration.KycStep;
 import com.namma.api.enumeration.WalletOwner;
 import com.namma.api.exception.OtpNotValidException;
 import com.namma.api.exception.PhoneNumberNotFoundException;
@@ -62,13 +64,27 @@ public class DriverServiceImpl implements DriverService {
 			driver.setPhoneNumber(phoneNumber);
 			driver.setOtp(bCryptPasswordEncoder.encode(token));
 			driver.setCreatedAt(LocalDateTime.now());
+			driver.setActive(false);
+			driver.setIsAvilable(false);
+			driver.setOnboardingStep(KycStep.DRIVING_LICENCE);
+			driver.setKycStatus(KycStatus.NOT_COMPLETED);
+			Driver saveDriver = driverRepository.save(driver);
+			
 			Wallet wallet = new Wallet();
-	        wallet.setDriver(driver);
+	        wallet.setDriver(saveDriver);
 	        wallet.setWalletOwner(WalletOwner.DRIVER);
 	        wallet.setBalance(new BigDecimal(500));
-	 
-            driver.setWallet(wallet);
-	    	driverRepository.save(driver);
+	        
+	        DriverKyc driverKyc = new DriverKyc();
+	        driverKyc.setDriver(saveDriver);
+	        
+	        driverKycRepository.save(driverKyc);
+	        walletRepository.save(wallet);
+	  
+	        saveDriver.setWallet(wallet);
+	        saveDriver.setDriverKyc(driverKyc);
+	        
+	    	driverRepository.save(saveDriver);
 		}else {
 			Driver driver = existingAuth.get();
 			driver.setOtp(bCryptPasswordEncoder.encode(token));
@@ -79,7 +95,7 @@ public class DriverServiceImpl implements DriverService {
 		return token;
 	}
 	
-	public void verifyOtp(String phoneNumber, String otp) throws OtpNotValidException, PhoneNumberNotFoundException {
+	public void verifyOtp(String phoneNumber, String otp, String deviceToken) throws OtpNotValidException, PhoneNumberNotFoundException {
 		// Find auth by phone number
         Optional<Driver> driverOptional = driverRepository.findByPhoneNumber(phoneNumber);
         

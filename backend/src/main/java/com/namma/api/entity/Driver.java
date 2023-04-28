@@ -61,9 +61,9 @@ public class Driver extends Auth {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
     
-    private Boolean active=true;
+    private Boolean active;
     
-    private Boolean isAvilable=true;
+    private Boolean isAvilable;
     
     @OneToMany(mappedBy = "driver", cascade = CascadeType.ALL)
     private List<Ride> rides = new ArrayList<>();
