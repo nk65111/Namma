@@ -22,23 +22,22 @@ function OTPScreen({ route }) {
     const token = useSelector(selectToken)
 
 
-    const { mutate } = useValidateToken((data) => navigator.navigate(data.user?.onboardCount || 'AboutYou'))
+    const { mutate } = useValidateToken((data) => navigator.navigate(data?.name ? 'HomeScreen' : 'AboutYou'))
 
     const { isLoading, mutate: verifyOtp } = useVerifyOtp((token) => mutate(token))
 
     const handleSubmit = async () => {
-        // if (otp === undefined || otp === "" || otp?.length !== 6) {
-        //     Vibration.vibrate(300);
-        //     setError("Invalid OTP");
-        // } else {
-        // }
-        let data = {
-            phoneNumber: route.params?.phoneNumber || '9818451195',
-            otp: otp || "416130",
-            deviceToken: await AsyncStorage.getItem('fcmToken')
-        };
-
-        verifyOtp({ token, data });
+        if (otp === undefined || otp === "" || otp?.length !== 6) {
+            Vibration.vibrate(300);
+            setError("Invalid OTP");
+        } else {
+            let data = {
+                phoneNumber: route.params?.phoneNumber,
+                otp: otp,
+                deviceToken: await AsyncStorage.getItem('fcmToken')
+            };
+            verifyOtp({ token, data });
+        }
     };
 
 

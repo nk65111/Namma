@@ -99,7 +99,7 @@ const BankDetail = () => {
                     </Box>
 
                     <View style={tw`flex-row items-center justify-between w-full pt-1`}>
-                        <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} extra='my-6' />
+                        <SecondaryButton disabled={!navigator.canGoBack()} text={'Back'} onPress={() => navigator.goBack()} extra='my-6' />
                         <PrimaryButton text={"Continue"} disabled={isLoading} onPress={handleSubmit} extra='my-6' />
                     </View>
                 </View>

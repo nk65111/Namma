@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { NavigationContainer } from '@react-navigation/native'
 import { useReduxDevToolsExtension } from '@react-navigation/devtools'
 import Splash from './screens/Splash'
@@ -11,17 +11,16 @@ import ProfilePic from './screens/AuthScreens/ProfilePic'
 import LiscencePic from './screens/AuthScreens/LiscencePic'
 
 import RNLocation from 'react-native-location';
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setCurrentLocation, setRides } from './slices/travelSlice'
 import { refetchLocation } from './utils/constant'
 import NavigatorTab from './NavigatorTab'
 import OneDayRides from './screens/Rides/OneDayRides'
 import ScheduleRide from './screens/Rides/ScheduleRide'
-import { Data, ridesData } from './utils/routeData'
 import { getLocation, useValidateToken } from './hooks'
-import { getToken } from './services/service'
-import { setToken } from './slices/userSlice'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { getRides, getToken } from './services/service'
+import { selectToken, setToken } from './slices/userSlice'
+import { useQuery } from 'react-query'
 
 RNLocation.configure({
   distanceFilter: 1
@@ -29,26 +28,35 @@ RNLocation.configure({
 
 function Routes() {
   const dispatch = useDispatch()
-
-  const navigationRef = React.useRef()
+  const navigationRef = useRef()
   useReduxDevToolsExtension(navigationRef)
-  const [jumpScreen, setJumpScreen] = React.useState('IntroScreen')
+  const [jumpScreen, setJumpScreen] = useState('IntroScreen')
   const [loading, setLoading] = useState(true);
   const [animationLoading, setAnimationLoading] = useState(true);
+  const token = useSelector(selectToken)
+  const { data: ridesRes, refetch: fetchRides } = useQuery('userRides', () => getRides(token), {
+    enabled: false, staleTime: 300000, onSuccess: (res) => {
+      if (res.data?.rides) {
+        dispatch(setRides(res.data || {}))
+      }
+    }
+  })
 
   const [userLocation, setUserLocation] = useState(null)
 
   useEffect(() => {
-    dispatch(setRides(ridesData))
-  }, [])
+    if (ridesRes?.data?.rides)
+      dispatch(setRides(ridesRes?.data))
+  }, [ridesRes])
 
   const { isLoading, mutate } = useValidateToken((data) => {
-    if (data) {
-      setJumpScreen(Data[data?.onboardCount] || 'AboutYou');
+    if (data.id) {
+      fetchRides();
+      setJumpScreen('HomeScreen' || 'IntroScreen');
     }
     setLoading(false)
   },
-    () => { setJumpScreen('AboutYou'); setLoading(false) }
+    () => { setJumpScreen('IntroScreen'); setLoading(false) }
   )
 
   const verifyToken = async () => {
@@ -139,7 +147,6 @@ function Routes() {
       </AuthStackNavigator.Navigator>
     )
   }
-  console.log(!loading, !isLoading)
 
   return !loading && !isLoading ? (
     <NavigationContainer>

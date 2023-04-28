@@ -20,7 +20,7 @@ public interface RideRepository extends JpaRepository<Ride, Long>{
    
    List<Ride> findByDriverOrderByDateDesc(Driver driver);
    
-   @Query(value = "Select * from rides where customer_id=?1 and date >=curdate() and pickup_time_first>=curtime() and status='PENDING' order by date,pickup_time_first asc",nativeQuery = true)
+   @Query(value = "Select * from rides where customer_id=?1 and date >=CURRENT_DATE and pickup_time_first>=CURRENT_TIME and status='PENDING' order by date,pickup_time_first asc",nativeQuery = true)
    List<Ride> findRidesByDateAndTimeWithCutomer(Long custId);
    
    @Query(value="SELECT * FROM rides WHERE pickup_time_first >=?1 and pickup_time_first <=?2 and Date(date)=Date(?3) and customer_id=?4 and status='PENDING'",nativeQuery = true)

@@ -13,10 +13,13 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import { GOOGLE_MAP_API_KEY } from '../../services/config'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated'
-import { ridesData } from '../../utils/routeData'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setRides as NewRides } from '../../slices/travelSlice'
 import BackButton from '../../components/BackButton'
+import { getRides, getToken } from '../../services/service'
+import { useAddRide, useUpdateRide } from '../../hooks'
+import { selectToken } from '../../slices/userSlice'
+import { useQuery } from 'react-query'
 
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -35,9 +38,9 @@ const months = [
   { month: 'Dec', days: 31 }
 ]
 function ScheduleRide({ route, navigation }) {
-
   let ride = route?.params?.ride
   const dispatch = useDispatch()
+  const token = useSelector(selectToken)
   const [initialStartName, setInitialStartName] = useState(ride?.pickUpLocation?.name || '')
   const [initialEndName, setInitialEndName] = useState(ride?.dropLocation?.name || '')
   const [step, setStep] = useState(ride || 1)
@@ -51,6 +54,7 @@ function ScheduleRide({ route, navigation }) {
   const [end, setEnd] = useState(ride ? { description: ride?.pickUpLocation?.name || '', location: { "lat": ride?.pickUpLocation?.lat, "lng": ride?.pickUpLocation?.lng } } : null)
   const [start, setStart] = useState(ride ? { description: ride?.dropLocation?.name || '', location: { "lat": ride?.dropLocation?.lat, "lng": ride?.dropLocation?.lng } } : null)
   const [pickUp, setPickUp] = useState(ride?.pickUpTime || null);
+  const [loading, setLoading] = useState(false)
 
 
   const isCurrentDay = (day) =>
@@ -77,34 +81,47 @@ function ScheduleRide({ route, navigation }) {
     setPickUp(new Date(data).toString())
     hideDatePicker();
   };
-  const handleRides = () => {
-    let prevRides = ridesData
-    let newRides = rides?.map(item => {
-      return {
-        id: Math.round(Math.random() * 10000),
-        pickUpLocation: {
-          lat: '',
-          lng: '',
-          name: start?.description
-        },
-        dropLocation: {
-          lat: '',
-          lng: '',
-          name: end?.description
-        },
-        status: 1,
-        pickUpTime: moment(pickUp).toISOString(),
-        pickUpDate: moment(item).toISOString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+
+  const { refetch: fetchRides } = useQuery('userRides', () => getRides(token), {
+    enabled: false,
+    staleTime: 300000,
+    onSuccess: (res) => {
+      if (res.data?.rides) {
+        dispatch(NewRides(res.data || {}))
       }
-    })
-    dispatch(NewRides([...prevRides, ...newRides]));
-    navigation.pop();
+    }
+  })
+
+  const { isLoading: adding, mutate: addRide } = useAddRide(() => { fetchRides(); route.params?.from == 'addRide' ? navigator.navigate('Add Ride') : navigator.goBack() })
+  const { isLoading: updating, mutate: updateRide } = useUpdateRide(() => { fetchRides(); navigator.goBack() })
+
+  const handleRides = async () => {
+    let token = await getToken();
+    let data = {
+      "dropLatitude": end?.location?.lat,
+      "dropLongitute": end?.location?.lng,
+      "metadata": `${JSON.stringify({
+        pickUpLocation: { ...start.location, name: start.description },
+        dropLocation: { ...end.location, name: end.description }
+      })}`,
+      "pickUpLatitiude": start?.location?.lat,
+      "pickUpLongitute": start?.location?.lng,
+      "pickUpTime": moment(pickUp).format("HH:mm:ss")
+    }
+    if (ride) {
+      data.id = ride.id;
+      data.date = ride.pickUpDate;
+
+      updateRide({ token, data })
+    }
+    else {
+      data.date = rides;
+      addRide({ token, data })
+    }
   }
 
   const confirmRide = () => {
-    Alert.alert("Ride Confirmation", 'after confirmation, you can edit your rides in My Rides?', [
+    Alert.alert("Ride Confirmation", 'after confirmation, you can edit your rides in My Rides!', [
       {
         text: 'Back',
         onPress: () => console.log('Cancel Pressed'),
@@ -162,7 +179,7 @@ function ScheduleRide({ route, navigation }) {
                 {Array.from({ length: new Date(`01-${monthDetails?.month}-${monthDetails?.year}`).getDay() }, (_, i) => i + 1).map((day) => (
                   <View key={day} style={[tw`w-[44px] h-[44px] m-[3px] rounded-xl flex-row justify-center items-center`]}></View>
                 ))}
-                {Array.from({ length: monthDetails?.days }, (_, i) => i + 1).map((day) => (<Day key={day} day={day} isCurrentDay={isCurrentDay(day)} month={monthDetails?.month} year={monthDetails?.year} disabled={moment(`${today.getDate() + "-" + months[today.getMonth()].month + "-" + today.getFullYear()}`).diff(moment(`${day}-${monthDetails?.month}-${monthDetails?.year}`), 'days') > 0} rides={rides} setRides={setRides} isSelected={rides.findIndex(item => moment(item).diff(moment(`${day + 1}-${monthDetails?.month}-${monthDetails?.year}`), 'days') == 0) > -1} />))}
+                {Array.from({ length: monthDetails?.days }, (_, i) => i + 1).map((day) => (<Day key={day} day={day} isCurrentDay={isCurrentDay(day)} month={monthDetails?.month} year={monthDetails?.year} disabled={moment(`${today.getDate() + "-" + months[today.getMonth()].month + "-" + today.getFullYear()}`).diff(moment(`${day}-${monthDetails?.month}-${monthDetails?.year}`), 'days') > 0} rides={rides} setRides={setRides} isSelected={rides.findIndex(item => moment(item).diff(moment(`${day}-${monthDetails?.month}-${monthDetails?.year}`), 'days') == 0) > -1} />))}
               </View>
             </View>
 
@@ -181,11 +198,13 @@ function ScheduleRide({ route, navigation }) {
                   minLength={2}
                   fetchDetails={true}
                   onPress={(data, details = null) => {
+                    setLoading(true)
                     setInitialStartName(data?.description)
                     setStart({
                       location: details?.geometry.location,
                       description: data?.description,
                     });
+                    setLoading(false)
                   }}
                   query={{
                     key: GOOGLE_MAP_API_KEY,
@@ -234,11 +253,13 @@ function ScheduleRide({ route, navigation }) {
                   minLength={2}
                   fetchDetails={true}
                   onPress={(data, details = null) => {
+                    setLoading(true)
                     setInitialEndName(data?.description);
                     setEnd({
                       location: details?.geometry.location,
                       description: data?.description,
                     });
+                    setLoading(false)
                   }}
                   query={{
                     key: GOOGLE_MAP_API_KEY,
@@ -291,7 +312,7 @@ function ScheduleRide({ route, navigation }) {
                 onCancel={hideDatePicker}
               />
             </View>
-            <PrimaryButton onPress={confirmRide} text={ride ? "Update Ride" : "Confirm Ride"} disabled={!start || !end || !pickUp} extra='mb-6 mt-20 ' />
+            <PrimaryButton onPress={confirmRide} text={ride ? "Update Ride" : "Confirm Ride"} disabled={!start || !end || !pickUp || adding || updating || loading} extra='mb-6 mt-20 ' />
           </View>
       }
     </Animated.View>
@@ -314,7 +335,7 @@ const Day = ({ day, isCurrentDay, month, year, disabled, rides, setRides, isSele
     }
   }
   return (
-    <TouchableOpacity disabled={disabled} onPress={() => handlePress(moment(`${day + 1}-${month}-${year}`))} style={[tw`w-[44px] h-[44px] m-[3px] rounded-xl flex-row justify-center items-center`, isCurrentDay ? { backgroundColor: 'white', borderWidth: 1, borderColor: colors.blue } : disabled ? { backgroundColor: colors.light_grey } : isSelected ? { backgroundColor: colors.blue } : { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.light_grey }, isSelected && { backgroundColor: colors.blue }]}>
+    <TouchableOpacity disabled={disabled} onPress={() => handlePress(moment(`${day}-${month}-${year}`))} style={[tw`w-[44px] h-[44px] m-[3px] rounded-xl flex-row justify-center items-center`, isCurrentDay ? { backgroundColor: 'white', borderWidth: 1, borderColor: colors.blue } : disabled ? { backgroundColor: colors.light_grey } : isSelected ? { backgroundColor: colors.blue } : { backgroundColor: colors.white, borderWidth: 1, borderColor: colors.light_grey }, isSelected && { backgroundColor: colors.blue }]}>
       <Text style={[tw`text-base text-center`, isCurrentDay ? { color: colors.blue } : isSelected ? { color: colors.white } : { color: colors.black }, isSelected && { color: colors.white }]}>
         {day}
       </Text>

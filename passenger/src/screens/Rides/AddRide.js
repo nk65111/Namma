@@ -15,10 +15,10 @@ import PrimaryButton from '../../components/PrimaryButton'
 function AddRide() {
     const navigator = useNavigation()
     const upcomingRide = useSelector(selectUpcomingRide)
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
 
     const addRide = () => {
-        navigator.navigate("Schedule")
+        navigator.navigate("Schedule", { from: 'addRide' })
     }
 
     const handleEdit = () => {
@@ -59,8 +59,8 @@ function AddRide() {
                             <View style={tw`w-2 h-2 rounded-full bg-gray-800`}></View>
                         </View>
                         <View style={tw`flex-grow px-2`}>
-                            <Text style={tw`text-lg`}>{upcomingRide.pickUpLocation?.name?.length > 25 ? `${upcomingRide.pickUpLocation?.name?.slice(0, 25)}...` : upcomingRide.pickUpLocation?.name}</Text>
-                            <Text style={tw`text-lg`}>{upcomingRide.dropLocation?.name?.length > 25 ? `${upcomingRide.dropLocation?.name?.slice(0, 25)}...` : upcomingRide.dropLocation?.name}</Text>
+                            <Text numberOfLines={1} style={tw`text-lg`}>{upcomingRide.pickUpLocation?.name}</Text>
+                            <Text numberOfLines={1} style={tw`text-lg`}>{upcomingRide.dropLocation?.name}</Text>
                         </View>
                         <View>
                             {
@@ -81,17 +81,17 @@ function AddRide() {
                             <Text style={tw`text-lg`}>{`${moment(upcomingRide?.pickUpTime)?.format('LT')} - ${moment(upcomingRide?.pickUpTime).add(30, 'minute')?.format('LT')}`}</Text>
                         </View>
                         <View style={tw`flex-row items-center my-2`}>
-                            <Text style={tw`text-lg font-medium`}>Travel Distance:  </Text>
-                            <Text style={tw`text-lg`}></Text>
+                            <Text style={tw`text-lg font-medium`}>Travel Distance: </Text>
+                            <Text style={tw`text-lg`}>{upcomingRide?.travelDistance}</Text>
                         </View>
                         <View style={tw`flex-row items-center my-2`}>
-                            <Text style={tw`text-lg font-medium`}>Travel Time:  </Text>
-                            <Text style={tw`text-lg`}></Text>
+                            <Text style={tw`text-lg font-medium`}>Travel Time: </Text>
+                            <Text style={tw`text-lg`}>{upcomingRide?.travelTime}</Text>
                         </View>
-                        <View style={tw`flex-row items-center justify-between my-4`}>
+                        {/* <View style={tw`flex-row items-center justify-between my-4`}>
                             <BlueButton text={'Edit Ride'} onPress={handleEdit} />
                             <PrimaryButton text={"Cancel"} onPress={handleCancel} />
-                        </View>
+                        </View> */}
                     </View>
                 </Animated.View>
                     :

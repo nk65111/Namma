@@ -87,6 +87,7 @@ public class DriverController {
         Auth auth=customUserDetails.getAuth();
         Driver driver=(Driver)auth;
         driver.setWalletId(driver.getWallet().getId());
+        driver.setKycId(driver.getDriverKyc().getId());
         return  ResponseEntity.ok(new JwtResponse(token,driver));
     	//return null;
     }

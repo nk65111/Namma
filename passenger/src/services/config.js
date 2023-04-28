@@ -9,4 +9,8 @@ export const endpoints = {
     verifyOtp: '/verifyOtp',
     profile: '/profile',
     updateProfile: '/update-profile',
+    updateRide: '/ride/update-book',
+    addRide: '/ride/book',
+    getRides: '/ride/get-completed-ride',
+    cancelRide: '/ride/delete-book'
 }

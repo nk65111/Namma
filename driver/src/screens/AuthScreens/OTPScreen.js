@@ -32,7 +32,7 @@ function OTPScreen({ route }) {
                 otp: otp
             }).then(data => {
                 onSuccess(data)
-            }).finally(() => setIsLoading(false));
+            }).finally(() => setIsLoading(false)); 
         }
     };
 

@@ -77,13 +77,13 @@ public class DriverServiceImpl implements DriverService {
 	        wallet.setBalance(new BigDecimal(500));
 	        walletRepository.save(wallet);
 	        saveDriver.setWallet(wallet);
-	        
+	    	driverRepository.save(saveDriver);
+	    	
 	        DriverKyc driverKyc = new DriverKyc();
 	        driverKyc.setCreatedAt(LocalDateTime.now());
-	        DriverKyc newdriverKyc = driverKycRepository.save(driverKyc);
-	        saveDriver.setDriverKyc(newdriverKyc);
+	        driverKyc.setDriver(saveDriver);
+	        this.driverKycRepository.save(driverKyc);
 	        
-	    	driverRepository.save(saveDriver);
 		}else {
 			Driver driver = existingAuth.get();
 			driver.setOtp(bCryptPasswordEncoder.encode(token));
@@ -289,22 +289,22 @@ public class DriverServiceImpl implements DriverService {
 	@Override
 	public String uploadLicence(MultipartFile licence, Long driverId) throws ResourceNotFoundException {
 		Optional<Driver> driverOptional= driverRepository.findById(driverId);
-    	if(driverOptional.get()==null) {
-    		throw new ResourceNotFoundException("Driver is not found");
-    	}
+		Driver driver = driverOptional.orElseThrow(() -> new ResourceNotFoundException("Driver is not found"));
     	
-    	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
+    	Optional<DriverKyc> driverKycOptional= driverKycRepository.findByDriver(driver);
+    	DriverKyc driverKyc = driverKycOptional.orElseThrow(() -> new ResourceNotFoundException("Driver Kyc is not found"));
+    	
     	String drivingLicenceUrl="https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png";
     	if(licence!=null) {
         	drivingLicenceUrl=uploadFileUtility.uploadFile(licence);
             driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
-            driverOptional.get().setKycStatus(KycStatus.PARTIALLY_COMPLETED);
-            driverOptional.get().setOnboardingStep(KycStep.BANK_DETAIL);
+            driver.setKycStatus(KycStatus.PARTIALLY_COMPLETED);
+            driver.setOnboardingStep(KycStep.BANK_DETAIL);
         }else {
         	driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
         }
     	
-    	driverRepository.save(driverOptional.get());
+    	driverRepository.save(driver);
     	driverKycRepository.save(driverKyc);
     	return drivingLicenceUrl;
 	}
@@ -312,10 +312,11 @@ public class DriverServiceImpl implements DriverService {
 	@Override
 	public void uploadBankDetails(DriverKycDto driverKycDto, Long driverId) throws ResourceNotFoundException {
 		Optional<Driver> driverOptional= driverRepository.findById(driverId);
-    	if(driverOptional.get()==null) {
-    		throw new ResourceNotFoundException("Driver is not found");
-    	}
-    	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
+		Driver driver = driverOptional.orElseThrow(() -> new ResourceNotFoundException("Driver is not found"));
+
+		Optional<DriverKyc> driverKycOptional= driverKycRepository.findByDriver(driver);
+    	DriverKyc driverKyc = driverKycOptional.orElseThrow(() -> new ResourceNotFoundException("Driver Kyc is not found"));
+    	
     	driverKyc.setBankname(driverKycDto.getBankName());
     	driverKyc.setBankAccountNumber(driverKycDto.getBankAccountNumber());
     	driverKyc.setIfscCode(driverKycDto.getIfscCode());
@@ -323,49 +324,53 @@ public class DriverServiceImpl implements DriverService {
     	driverKycRepository.save(driverKyc);
     	
     	//update step
-    	driverOptional.get().setOnboardingStep(KycStep.VEHICLE_DETAIL);
-    	driverRepository.save(driverOptional.get());
+    	driver.setOnboardingStep(KycStep.VEHICLE_DETAIL);
+    	driverRepository.save(driver);
 		
 	}
 
 	@Override
 	public void uploadVehicleDetails(DriverKycDto driverKycDto, Long driverId) throws ResourceNotFoundException {
 		Optional<Driver> driverOptional= driverRepository.findById(driverId);
-    	if(driverOptional.get()==null) {
-    		throw new ResourceNotFoundException("Driver is not found");
-    	}
-    	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
+		Driver driver = driverOptional.orElseThrow(() -> new ResourceNotFoundException("Driver is not found"));
+
+		Optional<DriverKyc> driverKycOptional= driverKycRepository.findByDriver(driver);
+    	DriverKyc driverKyc = driverKycOptional.orElseThrow(() -> new ResourceNotFoundException("Driver Kyc is not found"));
+    	
     	driverKyc.setVehicleModel(driverKycDto.getVehicleModel());
     	driverKyc.setDrivingLicenseNumber(driverKycDto.getDrivingLicenseNumber());
     	driverKyc.setVehicleRegistrationNumber(driverKycDto.getVehicleRegistrationNumber());
     	driverKycRepository.save(driverKyc);
     	
     	//update step
-    	driverOptional.get().setOnboardingStep(KycStep.PROFILE_PIC);
-    	driverRepository.save(driverOptional.get());
+    	driver.setOnboardingStep(KycStep.PROFILE_PIC);
+    	driverRepository.save(driver);
 	}
 
 	
 	@Override
 	public String uploadSelfie(MultipartFile selfie, Long driverId) throws ResourceNotFoundException {
 		Optional<Driver> driverOptional= driverRepository.findById(driverId);
-    	if(driverOptional.get()==null) {
-    		throw new ResourceNotFoundException("Driver is not found");
-    	}
+		Driver driver = driverOptional.orElseThrow(() -> new ResourceNotFoundException("Driver is not found"));
+
+		Optional<DriverKyc> driverKycOptional= driverKycRepository.findByDriver(driver);
+    	DriverKyc driverKyc = driverKycOptional.orElseThrow(() -> new ResourceNotFoundException("Driver Kyc is not found"));
     	
-    	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
     	String selieUrl="https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png";
     	if(selfie!=null) {
     		selieUrl=uploadFileUtility.uploadFile(selfie);
             driverKyc.setDrivingLicenceImgae(selieUrl);
-            driverOptional.get().setKycStatus(KycStatus.COMPLETED);
-            driverOptional.get().setOnboardingStep(KycStep.PROFILE_PIC);
+            driver.setKycStatus(KycStatus.COMPLETED);
+            driver.setOnboardingStep(KycStep.PROFILE_PIC);
         }else {
         	driverKyc.setDrivingLicenceImgae(selieUrl);
         }
     	
-    	driverRepository.save(driverOptional.get());
+    	driverRepository.save(driver);
     	driverKycRepository.save(driverKyc);
     	return selieUrl;
 	}
+	
+	
+	
 }

@@ -40,3 +40,18 @@ export const verifyOtp = ({ token, data }) => {
 export const updateProfile = ({ token, data }) => {
     return user.put(endpoints.updateProfile, data, { headers: { Authorization: `Bearer ${token}` } })
 }
+
+
+
+export const addRide = ({ token, data }) => {
+    return user.post(endpoints.addRide, data, { headers: { Authorization: `Bearer ${token}` } })
+}
+export const updateRide = ({ token, data }) => {
+    return user.put(endpoints.updateRide, data, { headers: { Authorization: `Bearer ${token}` } })
+}
+export const getRides = (token) => {
+    return user.get(endpoints.getRides, { headers: { Authorization: `Bearer ${token}` } })
+}
+export const cancelRide = ({ token, rideId }) => {
+    return user.delete(endpoints.cancelRide + `/${rideId}`, { headers: { Authorization: `Bearer ${token}` } })
+}
