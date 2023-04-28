@@ -34,7 +34,7 @@ const VehicalDetail = () => {
     }
 
     const vehicalDetailSubmit = (formData) => {
-        DriverKycService.addKyc(formData)
+        DriverKycService.updateVehicleDetail(formData)
             .then(() => {
                 navigator.navigate('PROFILE_PIC', { vehicleDetail: formData });
             })

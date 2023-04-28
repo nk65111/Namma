@@ -34,7 +34,7 @@ const BankDetail = () => {
     }
 
     const bankDetailSubmit = (formData) => {
-        DriverKycService.addKyc(formData)
+        DriverKycService.updateBankDetail(formData)
             .then(() => {
                 navigator.navigate('VEHICLE_DETAIL', { bankDetail: formData });
             })

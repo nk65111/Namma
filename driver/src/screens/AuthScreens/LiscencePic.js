@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { Alert, Image, Text, TouchableOpacity, View } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
-import tw from 'twrnc'
+import tw from 'twrnc';
 import BackButton from '../../components/BackButton'
 import PrimaryButton from '../../components/PrimaryButton'
 import SecondaryButton from '../../components/SecondaryButton'
@@ -20,8 +20,6 @@ const ProfilePic = ({ navigation }) => {
         let Handler = await PickImage(Location)
         if (Handler?.success) {
             setImage(Handler?.response)
-        } else {
-
         }
     }
 
@@ -43,8 +41,8 @@ const ProfilePic = ({ navigation }) => {
     const uploadLicence = (image) => {
         setIsLoading(true);
         let formData = new FormData();
-        formData.set("drivingLicenceImage", image);
-        DriverKycService.addKyc(image)
+        formData.append("drivingLicenceImage", image);
+        DriverKycService.uploadProfilePic(image)
             .then(() => {
                 navigator.navigate('BANK_DETAIL');
             })

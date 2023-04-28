@@ -42,7 +42,7 @@ function ProfilePic() {
 
     const uploadSelfie = (image) => {
         setIsLoading(true);
-        DriverKycService.addKyc(image)
+        DriverKycService.uploadProfilePic(image)
             .then(() => {
                 navigator.navigate('HomeScreen', { profilePic: image });
             })
