@@ -119,20 +119,56 @@ public class DriverController {
 
     
     
-    @PostMapping("/kyc")
-    public ResponseEntity<String> kyc(@RequestParam(required = false,value = "kycData") String  kycData,
-    		@RequestParam(required = false,value =  "drivingLicenceImage") MultipartFile drivingLicenceImage,
-    		@RequestParam(required = false,value = "selfieImage") MultipartFile selfieImage, Principal principal) 
-    				throws JsonMappingException, JsonProcessingException, ResourceNotFoundException {
+//    @PostMapping("/kyc")
+//    public ResponseEntity<String> kyc(@RequestParam(required = false,value = "kycData") String  kycData,
+//    		@RequestParam(required = false,value =  "drivingLicenceImage") MultipartFile drivingLicenceImage,
+//    		@RequestParam(required = false,value = "selfieImage") MultipartFile selfieImage, Principal principal) 
+//    				throws JsonMappingException, JsonProcessingException, ResourceNotFoundException {
+//    	
+//    	DriverKycDto driverKycDto=mapper.readValue(kycData, DriverKycDto.class);
+//    	Auth auth=getAuthByJwt(principal);
+//    	driverKycDto.setAuthId(auth.getId());
+//    	driverKycDto.setDrivingLicenceImage(drivingLicenceImage);
+//    	driverKycDto.setSelfieImage(selfieImage);
+//    	driverService.registerDriverKyc(driverKycDto);
+//        
+//        return new ResponseEntity<String>("Driver KYC details saved successfully", HttpStatus.CREATED);
+//    }
+    
+    @PutMapping("/upload-licence")
+    public ResponseEntity<String> uploadLicence(@RequestParam(required = false,value =  "drivingLicenceImage") MultipartFile drivingLicenceImage
+    		,Principal principal) throws ResourceNotFoundException{
     	
-    	DriverKycDto driverKycDto=mapper.readValue(kycData, DriverKycDto.class);
     	Auth auth=getAuthByJwt(principal);
-    	driverKycDto.setAuthId(auth.getId());
-    	driverKycDto.setDrivingLicenceImage(drivingLicenceImage);
-    	driverKycDto.setSelfieImage(selfieImage);
-    	driverService.registerDriverKyc(driverKycDto);
-        
-        return new ResponseEntity<String>("Driver KYC details saved successfully", HttpStatus.CREATED);
+    	String url=this.driverService.uploadLicence(drivingLicenceImage, auth.getId());
+    	return new ResponseEntity<String>(url,HttpStatus.OK);
+    	
+    }
+    
+    @PutMapping("/upload-selfie")
+    public ResponseEntity<String> uploadSelfie(@RequestParam(required = false,value =  "selfie") MultipartFile selfie
+    		,Principal principal) throws ResourceNotFoundException{
+    	
+    	Auth auth=getAuthByJwt(principal);
+    	String url=this.driverService.uploadSelfie(selfie, auth.getId());
+    	return new ResponseEntity<String>(url,HttpStatus.OK);
+    	
+    }
+    
+    
+    
+    @PutMapping("/upload-bankDetails")
+    public ResponseEntity<String> uploadBankDetails(@RequestBody DriverKycDto driverKycDto,Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	this.driverService.uploadBankDetails(driverKycDto, auth.getId());
+    	return new ResponseEntity<String>("Updated Bank Details",HttpStatus.OK);
+    }
+    
+    @PutMapping("/upload-vehicleDetails")
+    public ResponseEntity<String> uploadVehicleDetils(@RequestBody DriverKycDto driverKycDto,Principal principal) throws ResourceNotFoundException{
+    	Auth auth=getAuthByJwt(principal);
+    	this.driverService.uploadVehicleDetails(driverKycDto, auth.getId());
+    	return new ResponseEntity<String>("Updated Vehicle Details",HttpStatus.OK);
     }
     
     @GetMapping("/kyc")
