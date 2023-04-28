@@ -8,10 +8,7 @@ export const DriverService = {
         return fetch_({
             url: UPDATE_PROFILE,
             method: 'PUT',
-            data: user,
-            headers: {
-                'content-type': 'multipart/form-data'
-            },
+            data: user
         })
     },
     getMyProfile: () => {
@@ -32,10 +29,11 @@ export const DriverService = {
             method: 'DELETE',
         })
     },
-    updateLocation: () => {
+    updateLocation: (data) => {
         return fetch_({
             url: UPDATE_LOCATION,
             method: 'PUT',
+            data: data
         })
     }
 }

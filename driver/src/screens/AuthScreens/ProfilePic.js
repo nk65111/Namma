@@ -9,7 +9,7 @@ import PrimaryButton from '../../components/PrimaryButton'
 import SecondaryButton from '../../components/SecondaryButton'
 import { PickImage, colors } from '../../utils/constant'
 import Icon from 'react-native-vector-icons/EvilIcons';
-
+import { SetLocalStorage } from '../../helpers/FunctionHelper';
 import { DriverKycService } from '../../services';
 
 function ProfilePic() {
@@ -43,8 +43,11 @@ function ProfilePic() {
     const uploadSelfie = (image) => {
         setIsLoading(true);
         DriverKycService.uploadProfilePic(image)
-            .then(() => {
-                navigator.navigate('HomeScreen', { profilePic: image });
+            .then((data) => {
+                console.log("profile detail ---", data);
+                SetLocalStorage('DRIVER_DATA', JSON.stringify(data));
+                SetLocalStorage('PROFILE_IMAGE',);
+                navigation.navigate('HomeScreen');
             })
             .finally(() => setIsLoading(false))
     }

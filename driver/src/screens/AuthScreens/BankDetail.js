@@ -10,6 +10,7 @@ import PrimaryButton from '../../components/PrimaryButton'
 import SecondaryButton from '../../components/SecondaryButton'
 import { colors } from '../../utils/constant'
 import { DriverKycService } from '../../services';
+import { SetLocalStorage } from '../../helpers/FunctionHelper';
 
 const BankDetail = () => {
     const navigator = useNavigation();
@@ -35,8 +36,10 @@ const BankDetail = () => {
 
     const bankDetailSubmit = (formData) => {
         DriverKycService.updateBankDetail(formData)
-            .then(() => {
-                navigator.navigate('VEHICLE_DETAIL', { bankDetail: formData });
+            .then((data) => {
+                console.log("bank detail ---", data);
+                SetLocalStorage('DRIVER_DATA', JSON.stringify(data));
+                navigator.navigate('VEHICLE_DETAIL');
             })
             .finally(() => setIsLoading(false))
     }

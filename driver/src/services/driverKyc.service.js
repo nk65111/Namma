@@ -28,7 +28,7 @@ export const DriverKycService = {
             method: 'PUT',
             data: bankDetail,
             headers: {
-                'content-type': 'multipart/form-data'
+                'Content-Type': 'application/json'
             },
         })
     },
@@ -38,7 +38,7 @@ export const DriverKycService = {
             method: 'PUT',
             data: vehicleDetail,
             headers: {
-                'content-type': 'multipart/form-data'
+                'Content-Type': 'application/json'
             },
         })
     },

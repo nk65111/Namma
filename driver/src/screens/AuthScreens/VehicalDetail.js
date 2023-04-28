@@ -9,7 +9,7 @@ import BackButton from '../../components/BackButton'
 import PrimaryButton from '../../components/PrimaryButton'
 import SecondaryButton from '../../components/SecondaryButton'
 import { colors } from '../../utils/constant'
-
+import { SetLocalStorage } from '../../helpers/FunctionHelper';
 import { DriverKycService } from '../../services';
 
 const VehicalDetail = () => {
@@ -35,8 +35,10 @@ const VehicalDetail = () => {
 
     const vehicalDetailSubmit = (formData) => {
         DriverKycService.updateVehicleDetail(formData)
-            .then(() => {
-                navigator.navigate('PROFILE_PIC', { vehicleDetail: formData });
+            .then((data) => {
+                console.log("vehicle detail ---", data);
+                SetLocalStorage('DRIVER_DATA', JSON.stringify(data));
+                navigator.navigate('PROFILE_PIC');
             })
             .finally(() => setIsLoading(false))
     }

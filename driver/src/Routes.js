@@ -20,7 +20,7 @@ RNLocation.configure({
 });
 
 const Routes = () => {
-  const TIME_MS = 10000;
+  const TIME_MS = 100000;
   const dispatch = useDispatch();
   const navigationRef = React.useRef();
   useReduxDevToolsExtension(navigationRef);
@@ -126,7 +126,9 @@ const Routes = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      refetchLocation(dispatch)
+      DriverService.updateLocation((userLocation)).then(() => {
+        SetLocalStorage("CURRENT_LOCATION", userLocation);
+      })
     }, TIME_MS);
     return () => clearInterval(interval);
   }, []);

@@ -15,7 +15,7 @@ export const API_BASE_URL = {
 
     //Driver
     USER_PROFILE: '/driver/current-user',
-    UPDATE_PROFILE: `/driver/users/profile`,
+    UPDATE_PROFILE: `/driver/update-profile`,
     DELETE_PROFILE: `/driver/delete-profile`,
     UPDATE_LOCATION: `/driver/update-location`,
     RIDE_HISTORY: `/driver/ride/history-ride`,
@@ -24,8 +24,8 @@ export const API_BASE_URL = {
     ADD_KYC: `/driver/kyc`,
     GET_KYC: `/driver/kyc`,
     UPLOAD_LICENCE: (drivingLicenceImage) => `driver/upload-licence?drivingLicenceImage=${drivingLicenceImage}`,
-    UPDATE_BANK_DETAIL: `driver/upload-bankdetails`,
-    UPDATE_VEHICLE_DETAIL: `/upload-vehicledetails`,
+    UPDATE_BANK_DETAIL: `/driver/upload-bankdetails`,
+    UPDATE_VEHICLE_DETAIL: `/driver/upload-vehicledetails`,
     UPLOAD_SELFIE: (selfie) => `/driver/upload-selfie?selfie=${selfie}`,
 
     //Wallet

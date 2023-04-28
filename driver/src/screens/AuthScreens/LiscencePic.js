@@ -10,6 +10,7 @@ import SecondaryButton from '../../components/SecondaryButton'
 import { PickImage, colors } from '../../utils/constant'
 import Icon from 'react-native-vector-icons/EvilIcons'
 import { DriverKycService } from '../../services';
+import { SetLocalStorage } from '../../helpers/FunctionHelper';
 
 const ProfilePic = ({ navigation }) => {
     const navigator = useNavigation();
@@ -43,7 +44,8 @@ const ProfilePic = ({ navigation }) => {
         let formData = new FormData();
         formData.append("drivingLicenceImage", image);
         DriverKycService.uploadProfilePic(image)
-            .then(() => {
+            .then((data) => {
+                SetLocalStorage('DRIVER_DATA', JSON.stringify(data));
                 navigator.navigate('BANK_DETAIL');
             })
             .finally(() => setIsLoading(false))
