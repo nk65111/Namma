@@ -48,7 +48,7 @@ public class AbstractUserDetailsServiceImpl extends AbstractUserDetailsService {
 	protected UserType determineUserType() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String requestURI = request.getRequestURI();
-        if (requestURI.contains("/customer/")) {
+        if (requestURI.contains("/customer/")||requestURI.contains("wallet")) {
             return UserType.CUSTOMER;
         } else if (requestURI.contains("/driver/")) {
             return UserType.DRIVER;

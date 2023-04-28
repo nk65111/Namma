@@ -196,11 +196,12 @@ public class RideServiceImpl implements RideService {
 	private RideResponse getUpcomingRide(Long custId) {
 		
 	   Instant dateInstant=Instant.now();
-	   List<Ride> rides= this.rideRepository.findRidesByDateAndTimeWithCutomer(custId,dateInstant);
-		
+	   System.out.println(dateInstant);
+	   List<Ride> rides= this.rideRepository.findRidesByDateAndTimeWithCutomer(custId);
+		List<Ride> rides2=this.rideRepository.findAll();
 		 
-        
-         if(rides.size()!=0) {
+       
+       if(rides.size()!=0) {
 	   Ride ride=rides.get(0);
 	   RideResponse response=RideResponse.builder()
 				.date(ride.getDate())

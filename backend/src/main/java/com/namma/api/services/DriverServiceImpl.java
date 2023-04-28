@@ -62,6 +62,12 @@ public class DriverServiceImpl implements DriverService {
 			driver.setPhoneNumber(phoneNumber);
 			driver.setOtp(bCryptPasswordEncoder.encode(token));
 			driver.setCreatedAt(LocalDateTime.now());
+			Wallet wallet = new Wallet();
+	        wallet.setDriver(driver);
+	        wallet.setWalletOwner(WalletOwner.DRIVER);
+	        wallet.setBalance(new BigDecimal(500));
+	 
+            driver.setWallet(wallet);
 	    	driverRepository.save(driver);
 		}else {
 			Driver driver = existingAuth.get();
@@ -88,12 +94,7 @@ public class DriverServiceImpl implements DriverService {
             throw new OtpNotValidException("Invalid OTP for phone number: " + phoneNumber);
         }
         
-        Wallet wallet = new Wallet();
-        wallet.setDriver(driver);
-        wallet.setWalletOwner(WalletOwner.DRIVER);
-        wallet.setBalance(new BigDecimal(500));
-        walletRepository.save(wallet);
-
+        
         // Clear OTP and update driver record
         driver.setOtp(null);
         driverRepository.save(driver);
@@ -123,12 +124,22 @@ public class DriverServiceImpl implements DriverService {
         }
         
         //convert selfie image to url using cloudnary
-        String selfieUrl = uploadFileUtility.uploadFile(driverKycDto.getSelfieImage());
-        driverKyc.setSelfie(selfieUrl);
+        if(driverKycDto.getSelfieImage()!=null) {
+        	String selfieUrl = uploadFileUtility.uploadFile(driverKycDto.getSelfieImage());
+            driverKyc.setSelfie(selfieUrl);
+        }else {
+        	driverKyc.setSelfie("https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png");
+        }
+        
         
         //convert driving licence to url using cloudinary
-        String drivingLicenceUrl=uploadFileUtility.uploadFile(driverKycDto.getDrivingLicenceImage());
-        driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
+        if(driverKycDto.getDrivingLicenceImage()!=null) {
+        	String drivingLicenceUrl=uploadFileUtility.uploadFile(driverKycDto.getDrivingLicenceImage());
+            driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
+        }else {
+        	driverKyc.setDrivingLicenceImgae("https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png");
+        }
+        
         
         
         //set driver kyc status
