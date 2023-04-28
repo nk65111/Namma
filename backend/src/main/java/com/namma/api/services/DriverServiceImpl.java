@@ -7,6 +7,7 @@ import java.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.namma.api.dto.CustomerDto;
 import com.namma.api.dto.DriverDto;
@@ -18,6 +19,8 @@ import com.namma.api.entity.Driver;
 import com.namma.api.entity.DriverKyc;
 import com.namma.api.entity.DriverLocation;
 import com.namma.api.entity.Wallet;
+import com.namma.api.enumeration.KycStatus;
+import com.namma.api.enumeration.KycStep;
 import com.namma.api.enumeration.WalletOwner;
 import com.namma.api.exception.OtpNotValidException;
 import com.namma.api.exception.PhoneNumberNotFoundException;
@@ -101,53 +104,52 @@ public class DriverServiceImpl implements DriverService {
 	}
     
 
-    @Override
-    public void registerDriverKyc(DriverKycDto driverKycDto) throws ResourceNotFoundException {
-        // Map DriverKycDto to DriverKyc entity
-    	
-        DriverKyc driverKyc = new DriverKyc();
-        driverKyc.setDrivingLicenseNumber(driverKycDto.getDrivingLicenseNumber());
-        driverKyc.setBankname(driverKycDto.getBankName());
-        driverKyc.setBankAccountNumber(driverKycDto.getBankAccountNumber());
-        driverKyc.setIfscCode(driverKycDto.getIfscCode());
-        driverKyc.setAccountHolderName(driverKycDto.getAccountHolderName());
-        driverKyc.setVehicleRegistrationNumber(driverKycDto.getVehicleRegistrationNumber());
-        driverKyc.setVehicleModel(driverKycDto.getVehicleModel());
-        driverKyc.setKycSubmittedAt(new Date().toString());
-        driverKyc.setCreatedAt(LocalDateTime.now());
-        
-        Optional<Driver> driverOptional= driverRepository.findById(driverKycDto.getAuthId());
-        if(driverOptional.get()==null) {
-        	throw new ResourceNotFoundException("User is not found ");
-        }else {
-        	driverKyc.setDriver(driverOptional.get());
-        }
-        
-        //convert selfie image to url using cloudnary
-        if(driverKycDto.getSelfieImage()!=null) {
-        	String selfieUrl = uploadFileUtility.uploadFile(driverKycDto.getSelfieImage());
-            driverKyc.setSelfie(selfieUrl);
-        }else {
-        	driverKyc.setSelfie("https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png");
-        }
-        
-        
-        //convert driving licence to url using cloudinary
-        if(driverKycDto.getDrivingLicenceImage()!=null) {
-        	String drivingLicenceUrl=uploadFileUtility.uploadFile(driverKycDto.getDrivingLicenceImage());
-            driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
-        }else {
-        	driverKyc.setDrivingLicenceImgae("https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png");
-        }
-        
-        
-        
-        //set driver kyc status
-        //todo
-
-        // Save DriverKyc entity to database
-        driverKycRepository.save(driverKyc);
-    }
+//    @Override
+//    public void registerDriverKyc(DriverKycDto driverKycDto) throws ResourceNotFoundException {
+//        // Map DriverKycDto to DriverKyc entity
+//    	
+//        DriverKyc driverKyc = new DriverKyc();
+//       
+//        driverKyc.setBankname(driverKycDto.getBankName());
+//        driverKyc.setBankAccountNumber(driverKycDto.getBankAccountNumber());
+//        driverKyc.setIfscCode(driverKycDto.getIfscCode());
+//        driverKyc.setAccountHolderName(driverKycDto.getAccountHolderName());
+//        
+//        driverKyc.setVehicleModel(driverKycDto.getVehicleModel());
+//        
+//        
+//        Optional<Driver> driverOptional= driverRepository.findById(driverKycDto.getAuthId());
+//        if(driverOptional.get()==null) {
+//        	throw new ResourceNotFoundException("User is not found ");
+//        }else {
+//        	driverKyc.setDriver(driverOptional.get());
+//        }
+//        
+//        //convert selfie image to url using cloudnary
+//        if(driverKycDto.getSelfieImage()!=null) {
+//        	String selfieUrl = uploadFileUtility.uploadFile(driverKycDto.getSelfieImage());
+//            driverKyc.setSelfie(selfieUrl);
+//        }else {
+//        	driverKyc.setSelfie("https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png");
+//        }
+//        
+//        
+//        //convert driving licence to url using cloudinary
+//        if(driverKycDto.getDrivingLicenceImage()!=null) {
+//        	String drivingLicenceUrl=uploadFileUtility.uploadFile(driverKycDto.getDrivingLicenceImage());
+//            driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
+//        }else {
+//        	driverKyc.setDrivingLicenceImgae("https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png");
+//        }
+//        
+//        
+//        
+//        //set driver kyc status
+//        //todo
+//
+//        // Save DriverKyc entity to database
+//        driverKycRepository.save(driverKyc);
+//    }
 
     @Override
     public DriverKycDto getDriverKycDetails(long driverId) throws ResourceNotFoundException {
@@ -172,6 +174,7 @@ public class DriverServiceImpl implements DriverService {
             driverKycDto.setBankAccountNumber(driverKyc.getBankAccountNumber());
             driverKycDto.setIfscCode(driverKyc.getIfscCode());
             driverKycDto.setAccountHolderName(driverKyc.getAccountHolderName());
+           
             driverKycDto.setVehicleRegistrationNumber(driverKyc.getVehicleRegistrationNumber());
             driverKycDto.setVehicleModel(driverKyc.getVehicleModel());
             driverKycDto.setSelfieImageLink(driverKyc.getSelfie());
@@ -269,5 +272,80 @@ public class DriverServiceImpl implements DriverService {
 		    this.driverLocationRepository.save(driverLocation);
 	    }
 	   
+	}
+
+	@Override
+	public String uploadLicence(MultipartFile licence, Long driverId) throws ResourceNotFoundException {
+		Optional<Driver> driverOptional= driverRepository.findById(driverId);
+    	if(driverOptional.get()==null) {
+    		throw new ResourceNotFoundException("Driver is not found");
+    	}
+    	
+    	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
+    	String drivingLicenceUrl="https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png";
+    	if(licence!=null) {
+        	 drivingLicenceUrl=uploadFileUtility.uploadFile(licence);
+            driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
+            driverOptional.get().setKycStatus(KycStatus.PARTIALLY_COMPLETED);
+        }else {
+        	driverKyc.setDrivingLicenceImgae(drivingLicenceUrl);
+        }
+    	driverRepository.save(driverOptional.get());
+    	 driverKycRepository.save(driverKyc);
+    	 return drivingLicenceUrl;
+    	
+    	
+	}
+
+	@Override
+	public void uploadBankDetails(DriverKycDto driverKycDto, Long driverId) throws ResourceNotFoundException {
+		Optional<Driver> driverOptional= driverRepository.findById(driverId);
+    	if(driverOptional.get()==null) {
+    		throw new ResourceNotFoundException("Driver is not found");
+    	}
+    	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
+    	driverKyc.setBankname(driverKycDto.getBankName());
+    	driverKyc.setBankAccountNumber(driverKycDto.getBankAccountNumber());
+    	driverKyc.setIfscCode(driverKycDto.getIfscCode());
+    	driverKyc.setAccountHolderName(driverKycDto.getAccountHolderName());
+    	
+    	driverKycRepository.save(driverKyc);
+		
+	}
+
+	@Override
+	public void uploadVehicleDetails(DriverKycDto driverKycDto, Long driverId) throws ResourceNotFoundException {
+		Optional<Driver> driverOptional= driverRepository.findById(driverId);
+    	if(driverOptional.get()==null) {
+    		throw new ResourceNotFoundException("Driver is not found");
+    	}
+    	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
+    	driverKyc.setVehicleModel(driverKycDto.getVehicleModel());
+    	driverKyc.setDrivingLicenseNumber(driverKycDto.getDrivingLicenseNumber());
+    	driverKyc.setVehicleRegistrationNumber(driverKycDto.getVehicleRegistrationNumber());
+    	driverOptional.get().setKycStatus(KycStatus.COMPLETED);
+    	driverRepository.save(driverOptional.get());
+    	driverKycRepository.save(driverKyc);
+	}
+
+	@Override
+	public String uploadSelfie(MultipartFile selfie, Long driverId) throws ResourceNotFoundException {
+		Optional<Driver> driverOptional= driverRepository.findById(driverId);
+    	if(driverOptional.get()==null) {
+    		throw new ResourceNotFoundException("Driver is not found");
+    	}
+    	
+    	DriverKyc driverKyc= driverKycRepository.findByDriver(driverOptional.get()).get();
+    	String selieUrl="https://res.cloudinary.com/die9o5d6p/image/upload/v1682528550/images_osacrv.png";
+    	if(selfie!=null) {
+    		selieUrl=uploadFileUtility.uploadFile(selfie);
+            driverKyc.setDrivingLicenceImgae(selieUrl);
+            driverOptional.get().setKycStatus(KycStatus.PARTIALLY_COMPLETED);
+        }else {
+        	driverKyc.setDrivingLicenceImgae(selieUrl);
+        }
+    	driverRepository.save(driverOptional.get());
+    	 driverKycRepository.save(driverKyc);
+    	 return selieUrl;
 	}
 }
