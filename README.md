@@ -1,7 +1,8 @@
-# Raahi
+# Raahi App
 
-### Live Demo: <a href="https://www.dropbox.com/scl/fo/nfn3ww3f5tyvhhcuho8wk/h?dl=0&rlkey=00s8058sqqcoeejve19fdd9mv" target="_blank">GO TO LINK</a>
-### API URL: <a href="https://backend-production-2c46.up.railway.app/swagger-ui.html" target="_blank">GO TO LINK</a>
+### Live App: <a href="https://www.dropbox.com/scl/fo/nfn3ww3f5tyvhhcuho8wk/h?dl=0&rlkey=00s8058sqqcoeejve19fdd9mv" target="_blank">GO TO LINK</a>
+### Backend API URL: <a href="https://backend-production-2c46.up.railway.app/swagger-ui.html" target="_blank">GO TO LINK</a>
+### Website URL: <a href="https://raahi.onrender.com/" target="_blank">GO TO LINK</a>
 
 
 ### About Project
@@ -28,13 +29,13 @@ RAAHI APP has an e-wallet where users can add money at once and the wallet will 
 1. Create a mongo connection Key from MongoDB Atlas or Compass
 2. Clone the repo
    ```sh
-   git clone https://github.com/Ankit628792/CryptoPunk.git
+   git clone https://github.com/nk65111/Namma.git
    ```
-3. Install NPM packages
+3. cd driver and Install NPM packages
    ```sh
    npm install
    ```
-4. cd client, Install NPM packages
+4. cd passenger, Install NPM packages
    ```sh
    npm install
    ```   
