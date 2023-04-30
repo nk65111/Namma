@@ -10,6 +10,7 @@ import { GOOGLE_MAP_API_KEY } from '../../services/config'
 import Map from '../../components/Map'
 import { selectCurrentLocation, selectTravelTimeInfo, setDestination } from '../../slices/travelSlice'
 import { selectUserDetails } from '../../slices/userSlice'
+import { useNavigation } from '@react-navigation/native'
 
 const Search = ({ style }) => (
   <Svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={tw`w-7 h-7 ${style}`}>
@@ -19,6 +20,7 @@ const Search = ({ style }) => (
 
 
 function Home() {
+  const navigator = useNavigation()
   const dispatch = useDispatch();
   const currentLoc = useSelector(selectCurrentLocation)
   const travelInfo = useSelector(selectTravelTimeInfo);
@@ -28,11 +30,17 @@ function Home() {
     <Animated.View entering={FadeIn.duration(500)} style={tw`flex-1`}>
       <Animated.View entering={SlideInUp.duration(500)} style={[tw`p-4 pt-6 relative z-10 flex-row items-start justify-between w-full bg-white h-52`, { borderBottomRightRadius: 55 }]}>
         <Text style={tw`text-3xl font-medium pl-4`}>Hi, {userInfo?.name || 'Topi Kumar'}</Text>
-        <TouchableOpacity activeOpacity={0.9} style={tw`px-4 z-20 `}>
-          <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
-            uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-          }} />
-        </TouchableOpacity>
+
+        <View style={tw`flex-row items-center`}>
+          <TouchableOpacity onPress={() => navigator.navigate("Wallet")} activeOpacity={0.9} style={tw`px-2 z-20 `}>
+            <Image style={{ width: 32, height: 32 }} source={require("../../assets/images/wallet.png")} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigator.navigate("Profile")} activeOpacity={0.9} style={tw`px-2 z-20 `}>
+            <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
+              uri: userInfo?.profileImage || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+            }} />
+          </TouchableOpacity>
+        </View>
 
         <View style={[tw`py-2 flex-col items-center z-10 w-10`, {
           position: 'absolute',
@@ -125,7 +133,7 @@ function Home() {
           :
           <></>
       }
-      <View style={tw`flex-1 items-center justify-start bg-blue-50`}>
+      <View style={tw`flex-1 items-center justify-start`}>
         {currentLoc && <Map />}
       </View>
     </Animated.View>

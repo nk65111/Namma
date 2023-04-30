@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, View, TouchableOpacity, ScrollView, Alert } from 'react-native'
+import { Text, View, TouchableOpacity, ScrollView, Alert, Image, ActivityIndicator } from 'react-native'
 import tw from 'twrnc'
 import moment from 'moment'
 import { useState } from 'react'
@@ -15,10 +15,11 @@ import { useNavigation } from '@react-navigation/native'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectRide, setRide, setRides } from '../../slices/travelSlice'
 import { useQuery } from 'react-query'
-import { selectToken } from '../../slices/userSlice'
+import { selectToken, selectUserDetails } from '../../slices/userSlice'
 
 function OneDayRides() {
   const dispatch = useDispatch()
+  const userInfo = useSelector(selectUserDetails)
   const navigator = useNavigation()
   const ride = useSelector(selectRide)
   const token = useSelector(selectToken);
@@ -43,11 +44,16 @@ function OneDayRides() {
           <BackButton />
           <Text style={tw`text-gray-900 font-bold text-2xl ml-2`}>My Rides</Text>
         </View>
-        <TouchableOpacity activeOpacity={0.9} style={tw``} onPress={() => navigator.navigate('MyProfile')}>
-          <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
-            uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-          }} />
-        </TouchableOpacity>
+        <View style={tw`flex-row items-center`}>
+          <TouchableOpacity onPress={() => navigator.navigate("Wallet")} activeOpacity={0.9} style={tw`px-2 z-20 `}>
+            <Image style={{ width: 32, height: 32 }} source={require("../../assets/images/wallet.png")} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigator.navigate("Profile")} activeOpacity={0.9} style={tw`px-2 z-20 `}>
+            <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
+              uri: userInfo?.profileImage || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+            }} />
+          </TouchableOpacity>
+        </View>
       </View>
       <View style={tw`bg-white py-2 px-5 shadow-lg rounded-xl mx-auto my-4`}>
         <Text style={tw`text-2xl text-center font-medium`}>{moment(ride?.date).format("DD MMM YYYY")}</Text>
@@ -74,7 +80,7 @@ const RideInfo = ({ removeRide, dispatch, ride, navigator, token }) => {
     navigator.navigate("Schedule", { ride: ride })
   }
 
-  const { refetch: fetchRides } = useQuery('userRides', () => getRides(token), {
+  const { isLoading, refetch: fetchRides } = useQuery('userRides', () => getRides(token), {
     enabled: false,
     staleTime: 300000,
     onSuccess: (res) => {
@@ -99,6 +105,12 @@ const RideInfo = ({ removeRide, dispatch, ride, navigator, token }) => {
     ])
   }
 
+  if (canceling || isLoading) return (<>
+    <View style={tw`flex-row items-center justify-center h-40`}>
+      <ActivityIndicator size={30} />
+    </View>
+  </>)
+
   return (
     <>
       <Animated.View entering={FadeInUp} style={tw`py-2 px-4 shadow-lg bg-white rounded-lg mb-4`}>
@@ -108,11 +120,11 @@ const RideInfo = ({ removeRide, dispatch, ride, navigator, token }) => {
             <View style={tw`w-0.5 h-4 my-1 bg-gray-400`}></View>
             <View style={tw`w-2 h-2 rounded-full bg-gray-800`}></View>
           </View>
-          <View style={tw`flex-grow px-2`}>
+          <View style={tw`flex-grow px-2 pr-8`}>
             <Text numberOfLines={1} style={tw`text-lg`}>{ride.pickUpLocation?.name}</Text>
             <Text numberOfLines={1} style={tw`text-lg`}>{ride.dropLocation?.name}</Text>
           </View>
-          <View>
+          <View style={tw`absolute top-1 right-0`}>
             {
               open ?
                 <Icon name='arrow-up' size={20} />

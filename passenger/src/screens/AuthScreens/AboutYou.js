@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Box, FormControl, Input, Stack } from 'native-base'
 import React, { useState } from 'react'
-import { Alert, Text, TouchableOpacity, View, Image } from 'react-native'
+import { Alert, Text, TouchableOpacity, View, Image, ActivityIndicator } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
@@ -29,9 +29,9 @@ function AboutYou() {
 
         const source = {
             uri: image.path,
-            type: image.mime ,
+            type: image.mime,
             name: 'kuchbhi',
-          }
+        }
         let url = await uploadImage(source);
         updateProfile({ token, data: { image: url, name: formData.name } })
     }
@@ -81,38 +81,47 @@ function AboutYou() {
                         <Text style={tw`text-white text-3xl font-semibold text-center`}>Add Your Details</Text>
                     </View>
                 </View>
-
                 <View style={tw`w-full bg-white rounded-t-3xl p-10 h-full flex-col min-h-[420px]`}>
-                    <Box w="100%" maxWidth="300px" style={tw`mb-4`}>
-                        <FormControl isRequired>
-                            <Stack mx="4">
-                                <FormControl.Label>Your Name</FormControl.Label>
-                                <Input placeholder="Name" value={formData?.name} onChangeText={(txt) => setFormData({ ...formData, name: txt })} style={tw`p-2 text-base ios:mb-2`} />
-                                <FormControl.ErrorMessage>
-                                    Name must contain only letters
-                                </FormControl.ErrorMessage>
-                            </Stack>
-                        </FormControl>
-                    </Box>
-
-                    <View style={tw`w-full bg-white rounded-t-3xl flex-col`}>
-
-                        <TouchableOpacity onPress={() => handleImage()} style={tw`w-48 h-48 rounded-lg bg-gray-100 mx-auto my-6 flex-row items-center justify-center`}>
+                    {
+                        isLoading ?
                             <>
-                                {
-                                    Boolean(imageUrl) ?
-                                        <Image source={{ uri: imageUrl?.path }} resizeMode="cover" style={tw`h-full w-full rounded-lg`} />
-                                        :
-                                        <Icon name='image' size={100} style={tw`text-gray-600`} />
-                                }
+                                <View style={tw`flex-1 items-center justify-center`}>
+                                    <ActivityIndicator size={30} />
+                                </View>
                             </>
-                        </TouchableOpacity>
-                    </View>
+                            :
+                            <>
+                                <Box w="100%" maxWidth="300px" style={tw`mb-4`}>
+                                    <FormControl isRequired>
+                                        <Stack mx="4">
+                                            <FormControl.Label>Your Name</FormControl.Label>
+                                            <Input placeholder="Name" value={formData?.name} onChangeText={(txt) => setFormData({ ...formData, name: txt })} style={tw`p-2 text-base ios:mb-2`} />
+                                            <FormControl.ErrorMessage>
+                                                Name must contain only letters
+                                            </FormControl.ErrorMessage>
+                                        </Stack>
+                                    </FormControl>
+                                </Box>
 
-                    <View style={tw`flex-row items-center justify-between w-full pt-1`}>
-                        <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} extra='my-6' />
-                        <PrimaryButton text={"Continue"} disabled={isLoading} onPress={handleNext} extra='my-6' />
-                    </View>
+                                <View style={tw`w-full bg-white rounded-t-3xl flex-col`}>
+
+                                    <TouchableOpacity onPress={() => handleImage()} style={tw`w-48 h-48 rounded-lg bg-gray-100 mx-auto my-6 flex-row items-center justify-center`}>
+                                        <>
+                                            {
+                                                Boolean(imageUrl) ?
+                                                    <Image source={{ uri: imageUrl?.path }} resizeMode="cover" style={tw`h-full w-full rounded-lg`} />
+                                                    :
+                                                    <Icon name='image' size={100} style={tw`text-gray-600`} />
+                                            }
+                                        </>
+                                    </TouchableOpacity>
+                                </View>
+
+                                <View style={tw`flex-row items-center justify-between w-full pt-1`}>
+                                    <SecondaryButton disabled={!navigation.canGoBack()} text={'Back'} onPress={() => navigation.goBack()} extra='my-6' />
+                                    <PrimaryButton text={"Continue"} disabled={isLoading} onPress={handleNext} extra='my-6' />
+                                </View>
+                            </>}
                 </View>
 
             </LinearGradient>

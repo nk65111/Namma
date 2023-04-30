@@ -21,6 +21,7 @@ import { getLocation, useValidateToken } from './hooks'
 import { getRides, getToken } from './services/service'
 import { selectToken, setToken } from './slices/userSlice'
 import { useQuery } from 'react-query'
+import Wallet from './screens/HomeScreens/Wallet'
 
 RNLocation.configure({
   distanceFilter: 1
@@ -52,7 +53,7 @@ function Routes() {
   const { isLoading, mutate } = useValidateToken((data) => {
     if (data.id) {
       fetchRides();
-      setJumpScreen('HomeScreen' || 'IntroScreen');
+      setJumpScreen('HomeScreen');
     }
     setLoading(false)
   },
@@ -142,6 +143,7 @@ function Routes() {
           }}>
             <AuthStackNavigator.Screen name="Schedule" component={ScheduleRide} />
             <AuthStackNavigator.Screen name="OneDayRides" component={OneDayRides} />
+            <AuthStackNavigator.Screen name="Wallet" component={Wallet} />
           </AuthStackNavigator.Group>
         </>
       </AuthStackNavigator.Navigator>

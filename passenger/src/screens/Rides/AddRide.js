@@ -1,6 +1,6 @@
 import { Avatar } from 'native-base'
 import React from 'react'
-import { Alert, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, Image, Text, TouchableOpacity, View } from 'react-native'
 import Animated, { FadeInUp, SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import { useSelector } from 'react-redux'
 import tw from 'twrnc'
@@ -11,9 +11,11 @@ import moment from 'moment'
 import Icon from 'react-native-vector-icons/SimpleLineIcons'
 import BlueButton from '../../components/BlueButton'
 import PrimaryButton from '../../components/PrimaryButton'
+import { selectUserDetails } from '../../slices/userSlice'
 
 function AddRide() {
     const navigator = useNavigation()
+    const userInfo = useSelector(selectUserDetails)
     const upcomingRide = useSelector(selectUpcomingRide)
     const [open, setOpen] = useState(false);
 
@@ -41,11 +43,16 @@ function AddRide() {
 
             <View style={tw`flex-row items-center justify-between px-5 py-3 bg-white`}>
                 <Text style={tw`text-gray-900 font-bold text-2xl`}>My Rides</Text>
-                <TouchableOpacity activeOpacity={0.9} style={tw``} onPress={() => navigator.navigate('MyProfile')}>
-                    <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
-                        uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-                    }} />
-                </TouchableOpacity>
+                <View style={tw`flex-row items-center`}>
+                    <TouchableOpacity onPress={() => navigator.navigate("Wallet")} activeOpacity={0.9} style={tw`px-2 z-20 `}>
+                        <Image style={{ width: 32, height: 32 }} source={require("../../assets/images/wallet.png")} />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={() => navigator.navigate("Profile")} activeOpacity={0.9} style={tw`px-2 z-20 `}>
+                        <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
+                            uri: userInfo?.profileImage || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+                        }} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <View style={tw`px-5`}>
@@ -58,11 +65,11 @@ function AddRide() {
                             <View style={tw`w-0.5 h-4 my-1 bg-gray-400`}></View>
                             <View style={tw`w-2 h-2 rounded-full bg-gray-800`}></View>
                         </View>
-                        <View style={tw`flex-grow px-2`}>
+                        <View style={tw`flex-grow px-2 pr-8`}>
                             <Text numberOfLines={1} style={tw`text-lg`}>{upcomingRide.pickUpLocation?.name}</Text>
                             <Text numberOfLines={1} style={tw`text-lg`}>{upcomingRide.dropLocation?.name}</Text>
                         </View>
-                        <View>
+                        <View style={tw`absolute top-1 right-0`}>
                             {
                                 open ?
                                     <Icon name='arrow-up' size={20} />

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, TouchableOpacity, View } from 'react-native'
+import { Image, Text, TouchableOpacity, View } from 'react-native'
 import tw from 'twrnc'
 import Svg, { Path } from 'react-native-svg'
 import { colors } from '../../utils/constant'
@@ -8,10 +8,10 @@ import { Avatar } from 'native-base'
 import { useState } from 'react'
 import { useEffect } from 'react'
 import moment from 'moment/moment'
-import { ridesData } from '../../utils/routeData'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectRide, selectRides, setRide } from '../../slices/travelSlice'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
+import { selectUserDetails } from '../../slices/userSlice'
 
 
 const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -33,6 +33,7 @@ function MyRides() {
   const navigator = useNavigation();
   const today = new Date();
   const rides = useSelector(selectRides)
+  const userInfo = useSelector(selectUserDetails)
   const currentMonth = today.getMonth();
   const currentYear = today.getFullYear();
   const [selectedMonth, setSelectedMoth] = useState(currentMonth);
@@ -58,11 +59,16 @@ function MyRides() {
 
       <View style={tw`flex-row items-center justify-between px-5 py-3 bg-white`}>
         <Text style={tw`text-gray-900 font-bold text-2xl`}>My Rides</Text>
-        <TouchableOpacity activeOpacity={0.9} style={tw``} onPress={() => navigator.navigate('MyProfile')}>
-          <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
-            uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-          }} />
-        </TouchableOpacity>
+        <View style={tw`flex-row items-center`}>
+          <TouchableOpacity onPress={() => navigator.navigate("Wallet")} activeOpacity={0.9} style={tw`px-2 z-20 `}>
+            <Image style={{ width: 36, height: 36 }} source={require("../../assets/images/wallet.png")} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigator.navigate("Profile")} activeOpacity={0.9} style={tw`px-2 z-20 `}>
+            <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
+              uri: userInfo?.profileImage || "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+            }} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <>
