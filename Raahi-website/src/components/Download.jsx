@@ -1,7 +1,6 @@
 import React from 'react';
 
 import styles from '../styles/Global';
-import assets from '../assets';
 
 const Download = () => {
   return (
@@ -13,11 +12,6 @@ const Download = () => {
         </div>
         <a href='https://github.com/nk65111/Namma' className={styles.btnPrimary}>Source Code</a>
         <div className={styles.flexCenter}>
-          <img 
-            src={assets.final5}
-            alt="download_png"
-            className={styles.fullImg}
-          />
         </div>
       </div>
     </div>
