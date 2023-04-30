@@ -31,8 +31,10 @@ function OTPScreen({ route }) {
                 phoneNumber: route.params?.phoneNumber,
                 otp: otp
             }).then(data => {
+                console.log(data)
                 onSuccess(data)
-            }).finally(() => setIsLoading(false)); 
+            }).catch(e => console.log("Verify otp ", e))
+            .finally(() => setIsLoading(false)); 
         }
     };
 
