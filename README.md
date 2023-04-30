@@ -14,7 +14,6 @@ RAAHI APP has an e-wallet where users can add money at once and the wallet will 
 
 ### Built With
 
-This section should list any major frameworks that we built our project using. 
 * [Java Spring Boot]
 * [TailwindCSS]
 * [React Native]
