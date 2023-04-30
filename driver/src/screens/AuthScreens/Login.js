@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Text } from 'react-native'
+import { Text, ActivityIndicator } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { View, Box, FormControl, Stack, Input } from 'native-base'
 import LinearGradient from 'react-native-linear-gradient'
@@ -33,7 +33,18 @@ function Login() {
         }
     }
 
+    if (isLoading) {
+        return (
+            <>
+                <View style={tw`flex-1 items-center justify-center`}>
+                    <ActivityIndicator size={30} />
+                </View>
+            </>
+        )
+    }
+
     return (
+
         <Animated.View exiting={SlideInLeft} entering={SlideInRight} style={tw`flex-1 items-center justify-center relative`}>
             <LinearGradient colors={colors.gradient_blue} style={tw`flex-1 items-center justify-between h-full w-full relative`}>
                 <View style={tw`w-full`}>

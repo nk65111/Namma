@@ -80,7 +80,7 @@ public class DriverController {
             e.printStackTrace();
             throw new Exception(e.getMessage());
         }
-//
+
         UserDetails userDetails= abstractUserDetailsService.loadUserByUsername(jwtRequest.getPhoneNumber());
         String token =this.jwtUtil.generateToken(userDetails);
         CustomUserDetails customUserDetails= (CustomUserDetails)userDetails;
@@ -89,7 +89,6 @@ public class DriverController {
         driver.setWalletId(driver.getWallet().getId());
         driver.setKycId(driver.getDriverKyc().getId());
         return  ResponseEntity.ok(new JwtResponse(token,driver));
-    	//return null;
     }
     
  

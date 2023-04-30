@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Box, FormControl, Input, Stack } from 'native-base'
 import React, { useState } from 'react'
-import { Alert, Text, View } from 'react-native'
+import { Alert, Text, View, ActivityIndicator } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
@@ -17,13 +17,13 @@ const VehicalDetail = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
-        liscenceNumber: '',
-        vehicleNumber: '',
+        drivingLicenseNumber: '',
+        vehicleRegistrationNumber: '',
         vehicleModel: ''
     })
 
     const handleSubmit = () => {
-        if (formData?.name || formData?.liscenceNumber || formData?.vehicleModel || formData?.vehicleNumber)
+        if (formData?.name || formData?.drivingLicenseNumber || formData?.vehicleModel || formData?.vehicleRegistrationNumber)
             vehicalDetailSubmit(formData);
         else
             Alert.alert('', 'Please fill all the details',
@@ -42,6 +42,17 @@ const VehicalDetail = () => {
             })
             .finally(() => setIsLoading(false))
     }
+
+    if (isLoading) {
+        return (
+            <>
+                <View style={tw`flex-1 items-center justify-center`}>
+                    <ActivityIndicator size={30} />
+                </View>
+            </>
+        )
+    }
+
 
     return (
         <Animated.View exiting={SlideInLeft} entering={SlideInRight} style={tw`flex-1 items-center justify-center relative`}>
@@ -70,7 +81,7 @@ const VehicalDetail = () => {
                         <FormControl isRequired>
                             <Stack mx="4">
                                 <FormControl.Label>Driving Liscence Number</FormControl.Label>
-                                <Input placeholder="DL14 20110012345" maxLength={16} value={formData?.liscenceNumber} onChangeText={(txt) => setFormData({ ...formData, liscenceNumber: txt })} style={tw`p-2 text-base ios:mb-2`} />
+                                <Input placeholder="DL14 20110012345" maxLength={16} value={formData?.drivingLicenseNumber} onChangeText={(txt) => setFormData({ ...formData, drivingLicenseNumber: txt })} style={tw`p-2 text-base ios:mb-2`} />
                                 <FormControl.ErrorMessage>
                                     Invalid Format
                                 </FormControl.ErrorMessage>
@@ -81,7 +92,7 @@ const VehicalDetail = () => {
                         <FormControl isRequired>
                             <Stack mx="4">
                                 <FormControl.Label>Vehicle Register Number</FormControl.Label>
-                                <Input placeholder="TN 75 AA 7106" maxLength={10} value={formData?.vehicleNumber} onChangeText={(txt) => setFormData({ ...formData, vehicleNumber: txt })} style={tw`p-2 text-base ios:mb-2`} />
+                                <Input placeholder="TN 75 AA 7106" maxLength={10} value={formData?.vehicleRegistrationNumber} onChangeText={(txt) => setFormData({ ...formData, vehicleRegistrationNumber: txt })} style={tw`p-2 text-base ios:mb-2`} />
                                 <FormControl.ErrorMessage>
                                     Invalid Format
                                 </FormControl.ErrorMessage>
