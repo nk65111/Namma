@@ -1,7 +1,7 @@
 import { useNavigation } from '@react-navigation/native'
 import { Box, FormControl, Input, Stack } from 'native-base'
 import React, { useState } from 'react'
-import { Alert, Text, View } from 'react-native'
+import { Alert, Text, View, ActivityIndicator } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
@@ -42,6 +42,16 @@ const BankDetail = () => {
                 navigator.navigate('VEHICLE_DETAIL');
             })
             .finally(() => setIsLoading(false))
+    }
+
+    if (isLoading) {
+        return (
+            <>
+                <View style={tw`flex-1 items-center justify-center`}>
+                    <ActivityIndicator size={30} />
+                </View>
+            </>
+        )
     }
 
     return (
@@ -93,7 +103,7 @@ const BankDetail = () => {
                         <FormControl isRequired>
                             <Stack mx="4">
                                 <FormControl.Label>Accountholder Name</FormControl.Label>
-                                <Input placeholder="Honda Civic" value={formData?.accountHolderName} onChangeText={(txt) => setFormData({ ...formData, accountHolderName: txt })} style={tw`p-2 text-base ios:mb-2`} />
+                                <Input placeholder="Account holder name" value={formData?.accountHolderName} onChangeText={(txt) => setFormData({ ...formData, accountHolderName: txt })} style={tw`p-2 text-base ios:mb-2`} />
                                 <FormControl.ErrorMessage>
                                     Invalid Format
                                 </FormControl.ErrorMessage>

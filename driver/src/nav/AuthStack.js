@@ -12,6 +12,7 @@ import BankDetail from '../screens/AuthScreens/BankDetail';
 import VehicalDetail from '../screens/AuthScreens/VehicalDetail';
 import ProfilePic from '../screens/AuthScreens/ProfilePic';
 import AboutYou from '../screens/AuthScreens/AboutYou';
+import Wallet from '../screens/wallet';
 
 const AuthStack = (props) => {
     const AuthStackNavigator = createStackNavigator();
@@ -49,6 +50,7 @@ const AuthStack = (props) => {
                 <AuthStackNavigator.Screen name="PROFILE_PIC" component={ProfilePic} />
                 <AuthStackNavigator.Screen name="AboutYou" component={AboutYou} />
                 <AuthStackNavigator.Screen name="HomeScreen" component={NavigatorTab} />
+                <AuthStackNavigator.Screen name="wallet" component={Wallet} />
             </>
         </AuthStackNavigator.Navigator>
     )

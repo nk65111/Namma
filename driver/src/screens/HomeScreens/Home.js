@@ -1,5 +1,5 @@
 import { Avatar } from 'native-base'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dimensions, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import Animated, { FadeIn, SlideInUp } from 'react-native-reanimated'
 import Svg, { Path } from 'react-native-svg'
@@ -9,7 +9,7 @@ import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplet
 import { GOOGLE_MAP_API_KEY } from '../../common/config'
 import Map from '../../components/Map'
 import { selectCurrentLocation, selectTravelTimeInfo, setDestination } from '../../slices/travelSlice'
-
+import { useNavigation } from '@react-navigation/native';
 
 const Search = ({ style }) => (
   <Svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" style={tw`w-7 h-7 ${style}`}>
@@ -19,19 +19,53 @@ const Search = ({ style }) => (
 
 
 function Home() {
+  const navigator = useNavigation();
   const dispatch = useDispatch();
-  const currentLoc = useSelector(selectCurrentLocation)
-  const travelInfo = useSelector(selectTravelTimeInfo)
+  const currentLoc = useSelector(selectCurrentLocation);
+  const travelInfo = useSelector(selectTravelTimeInfo);
+  const [isAuthChecked, setIsAuthChecked] = useState();
+  const [userInfo, setUserInfo] = useState();
+
+  const validateIsLogin = async () => {
+    const isAuth = await GetLocalStorage('IS_AUTH');
+    const userData = await GetLocalStorage('DRIVER_DATA', true);
+    const accessToken = await GetLocalStorage('AUTH_TOKEN_KEY');
+    if (isAuth && userData && accessToken) {
+      setIsAuthChecked(true);
+      setUserInfo(userData);
+    }
+  }
+
+  useEffect(() => {
+    validateIsLogin();
+  }, []);
 
   return (
     <Animated.View entering={FadeIn.duration(500)} style={tw`flex-1`}>
       <Animated.View entering={SlideInUp.duration(500)} style={[tw`p-4 pt-6 relative z-10 flex-row items-start justify-between w-full bg-white h-52`, { borderBottomRightRadius: 55 }]}>
-        <Text style={tw`text-3xl font-medium pl-4`}>Hi, Topi Kumar</Text>
-        <TouchableOpacity activeOpacity={0.9} style={tw`px-4 z-20 `}>
-          <Avatar zIndex={20} bg="cyan.500" style={tw`border-4 border-gray-100`} alignSelf="center" size="md" source={{
-            uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
-          }} />
-        </TouchableOpacity>
+
+        <Text style={tw`text-3xl font-medium pl-4`}>Hi, {userInfo?.name || "Topi Kumar"}</Text>
+        <View style={tw`flex-row items-center`}>
+          <TouchableOpacity
+            onPress={() => navigator.navigate("wallet")}
+            activeOpacity={0.9} style={tw`px-2 z-20 `}
+          >
+            <Image style={{ width: 32, height: 32 }} source={require("../../assets/images/wallet.png")} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            activeOpacity={0.9}
+            style={tw`px-4 z-20 `}
+          >
+            <Avatar
+              zIndex={20}
+              bg="cyan.500"
+              style={tw`border-4 border-gray-100`}
+              alignSelf="center" size="md" source={{
+                uri: "https://images.unsplash.com/photo-1603415526960-f7e0328c63b1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80"
+              }}
+            />
+          </TouchableOpacity>
+        </View>
 
         <View style={[tw`py-2 flex-col items-center z-10 w-10`, {
           position: 'absolute',

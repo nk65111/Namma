@@ -14,8 +14,8 @@ export default function NavigatorTab() {
         <Tab.Navigator tabBar={(props) => <CustomBottomTab {...props} />}>
             <Tab.Group screenOptions={{ headerShown: false }}>
                 <Tab.Screen options={{ tabBarLabel: 'Home' }} name="Home" component={Home} />
-                <Tab.Screen options={{ tabBarLabel: 'Route2' }} name="Route2" component={ComingSoon2} />
-                <Tab.Screen options={{ tabBarLabel: 'Route3' }} name="Route3" component={ComingSoon3} />
+                <Tab.Screen options={{ tabBarLabel: 'Rides' }} name="Rides" component={ComingSoon2} />
+                <Tab.Screen options={{ tabBarLabel: 'Earning' }} name="Earning" component={ComingSoon3} />
                 <Tab.Screen options={{ tabBarLabel: 'Profile' }} name="Profile" component={MyProfile} />
             </Tab.Group>
         </Tab.Navigator>

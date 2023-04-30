@@ -125,12 +125,15 @@ const Routes = () => {
   }, [])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      DriverService.updateLocation((userLocation)).then(() => {
-        SetLocalStorage("CURRENT_LOCATION", userLocation);
-      })
-    }, TIME_MS);
-    return () => clearInterval(interval);
+    if (isAuthChecked) {
+      console.log(userLocation);
+      const interval = setInterval(() => {
+        DriverService.updateLocation((userLocation)).then(() => {
+          SetLocalStorage("CURRENT_LOCATION", userLocation);
+        })
+      }, TIME_MS);
+      return () => clearInterval(interval);
+    }
   }, []);
 
   useEffect(() => {

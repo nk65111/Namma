@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
 import React, { useState } from 'react'
-import { Image, Text, TouchableOpacity, View, Alert } from 'react-native'
+import { Image, Text, TouchableOpacity, View, Alert, ActivityIndicator } from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import Animated, { SlideInLeft, SlideInRight } from 'react-native-reanimated'
 import tw from 'twrnc'
@@ -50,6 +50,16 @@ function ProfilePic() {
                 navigation.navigate('HomeScreen');
             })
             .finally(() => setIsLoading(false))
+    }
+
+    if (isLoading) {
+        return (
+            <>
+                <View style={tw`flex-1 items-center justify-center`}>
+                    <ActivityIndicator size={30} />
+                </View>
+            </>
+        )
     }
 
     return (
