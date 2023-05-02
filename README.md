@@ -1,5 +1,7 @@
 # Raahi App
 
+### IMPORTANT: we're using test version of twilio. To get OTP, the number must be registered as trusty on twilio. To use the app, please contact one of us, we'll reach you as soon as possible.
+
 ### Live App: <a href="https://www.dropbox.com/scl/fo/nfn3ww3f5tyvhhcuho8wk/h?dl=0&rlkey=00s8058sqqcoeejve19fdd9mv" target="_blank">GO TO LINK</a>
 ### Backend API URL: <a href="https://backend-production-2c46.up.railway.app/swagger-ui.html" target="_blank">GO TO LINK</a>
 ### Website URL: <a href="https://raahi.onrender.com/" target="_blank">GO TO LINK</a>
