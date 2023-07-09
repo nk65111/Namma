@@ -25,31 +25,6 @@ RAAHI APP has an e-wallet where users can add money at once and the wallet will 
 * Firebase
 * Docker
 
-
-### Installation
-
-1. Create a mongo connection Key from MongoDB Atlas or Compass
-2. Clone the repo
-   ```sh
-   git clone https://github.com/nk65111/Namma.git
-   ```
-3. cd driver and Install NPM packages
-   ```sh
-   npm install
-   ```
-4. cd passenger, Install NPM packages
-   ```sh
-   npm install
-   ```   
-5. Enter your Connection key in `.env` in root folder
-   ```
-    DB_URI = 'ENTER YOUR CONNECTION KEY';
-   ```
-6. Enter your SECRET key in `.env` in root folder
-   ```
-   SECRET_KEY = 'ENTER YOUR SECRET KEY';
-   ```
-
 <!-- LICENSE -->
 ## License
 
